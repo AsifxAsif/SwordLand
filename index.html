@@ -1,0 +1,1651 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Alliance · Data Viewer</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ['Poppins', 'system-ui', 'sans-serif']
+						},
+						colors: {
+							brand: {
+								50: '#eef2ff',
+								100: '#e0e7ff',
+								200: '#c7d2fe',
+								300: '#a5b4fc',
+								400: '#818cf8',
+								500: '#6366f1',
+								600: '#4f46e5',
+								700: '#4338ca',
+								800: '#3730a3',
+								900: '#312e81'
+							}
+						}
+					}
+				}
+			}
+
+		</script>
+		<style>
+			:root {
+				--gold: #e8b930;
+				--silver: #c0cad8;
+				--bronze: #c98650;
+				--q-legendary: #c0392b;
+				--q-mythic: #c9a24a;
+				--q-epic: #8a63c9;
+				--q-rare: #4b8fd1;
+				--q-uncommon: #7fbf7f;
+				--t-red: #c0392b;
+				--t-gold: #c9a24a;
+				--t-violet: #8a63c9;
+				--t-sky: #4b8fd1;
+				--t-green: #7fbf7f;
+				--t-grey: #5f6977;
+			}
+
+			html,
+			body {
+				height: 100%;
+			}
+
+			body {
+				font-family: 'Poppins', sans-serif;
+				background: #f1f5f9;
+				color: #1f2937;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #c7d2fe;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #a5b4fc;
+			}
+
+			/* ---------- CSS Grid Table ---------- */
+			.grid-table {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+			}
+
+			.grid-row {
+				display: grid;
+				grid-template-columns:
+					50px 350px 100px 100px 200px 375px 275px;
+				align-items: center;
+				border-bottom: 1px solid #e5e7eb;
+				transition: background 0.1s;
+				min-height: 92px;
+			}
+
+			.grid-row:not(.grid-header):hover {
+				background: #f9fafb;
+				cursor: pointer;
+			}
+
+			.grid-header {
+				background: #f8fafc;
+				font-weight: 600;
+				color: #6b7280;
+				font-size: 11px;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				position: sticky;
+				text-align: center;
+				top: 0;
+				z-index: 10;
+				border-bottom: 2px solid #e5e7eb;
+				cursor: pointer;
+				user-select: none;
+				min-height: 44px;
+			}
+
+			.grid-cell {
+				padding: 8px 12px;
+				font-size: 13px;
+				white-space: nowrap;
+				overflow: visible;
+				font-variant-numeric: tabular-nums;
+				text-align: center;
+				line-height: 1.35;
+			}
+
+			.grid-cell.pl {
+				text-align: left;
+				overflow: hidden;
+			}
+
+			.grid-cell.rank {
+				text-align: center;
+				font-size: 14px;
+			}
+
+			.cell-main {
+				display: inline-flex;
+				align-items: center;
+				justify-content: flex-end;
+				gap: 6px;
+				flex-wrap: nowrap;
+			}
+
+			.cell-val {
+				font-weight: 600;
+				color: #111827;
+			}
+
+			.troop-cell {
+				display: inline-flex;
+				align-items: center;
+				justify-content: flex-end;
+				gap: 6px;
+				flex-wrap: nowrap;
+			}
+
+			.troop-pill {
+				display: inline-flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1px;
+				background: #f1f5f9;
+				border: 1px solid #e2e8f0;
+				border-radius: 8px;
+				padding: 3px 6px;
+				min-width: 42px;
+				line-height: 1.15;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.troop-pill img {
+				width: 16px;
+				height: 16px;
+				border-radius: 4px;
+				margin-bottom: 1px;
+			}
+
+			.troop-pill .tt {
+				font-size: 11px;
+				font-weight: 700;
+				color: #0f172a;
+			}
+
+			.troop-pill .tg {
+				font-size: 8px;
+				font-weight: 600;
+				color: #64748b;
+				letter-spacing: 0.02em;
+			}
+
+			/* --- Lead Heroes Row --- */
+			.lead-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				margin-top: 4px;
+			}
+
+			.lead-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 10px;
+				color: #64748b;
+				background: #f1f5f9;
+				padding: 2px 6px 2px 2px;
+				border-radius: 999px;
+				white-space: nowrap;
+				line-height: 1.2;
+				border: 1px solid #e2e8f0;
+				position: relative;
+			}
+
+			.lead-chip img {
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				object-fit: cover;
+				background: #e2e8f0;
+				flex: none;
+				border: 1px solid #fff;
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+			}
+
+			/* ---------- Governor gear / charm icon grids ---------- */
+			.gear-icon-grid {
+				display: grid;
+				grid-template-columns: repeat(6, 42px);
+				gap: 12px;
+				justify-content: flex-end;
+				align-items: flex-end;
+			}
+
+			.gear-tile {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 2px;
+				width: 42px;
+			}
+
+			.gear-tile .gear-frame {
+				width: 42px;
+				height: 42px;
+				border-radius: 8px;
+				padding: 3px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-sizing: border-box;
+				position: relative;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+				overflow: hidden;
+			}
+
+			.gear-tile .gear-frame img {
+				width: 100%;
+				height: 100%;
+				border-radius: 5px;
+				object-fit: cover;
+				display: block;
+				background: transparent;
+			}
+
+			.gear-tile .stars {
+				font-size: 10px;
+				line-height: 1;
+				color: #f59e0b;
+				letter-spacing: -0.2px;
+				height: 10px;
+				font-weight: 800;
+				text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+			}
+
+			.gear-tile .tier {
+				font-size: 9px;
+				font-weight: 700;
+				color: #475569;
+				line-height: 1;
+			}
+
+			/* Quality backgrounds for table and modal */
+			.q-legendary {
+				background: var(--q-legendary);
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.q-mythic {
+				background: var(--q-mythic);
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.q-epic {
+				background: var(--q-epic);
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.q-rare {
+				background: var(--q-rare);
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.q-uncommon {
+				background: var(--q-uncommon);
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.q-unknown {
+				background: #94a3b8;
+				border: 1px solid rgba(0, 0, 0, 0.3);
+			}
+
+			.charm-icon-grid {
+				display: grid;
+				grid-template-columns: repeat(3, auto);
+				grid-template-rows: repeat(2, auto);
+				gap: 10px 14px;
+				justify-content: flex-end;
+				align-items: center;
+			}
+
+			.charm-group {
+				display: inline-flex;
+				gap: 6px;
+				align-items: flex-start;
+				justify-content: center;
+			}
+
+			.charm-item {
+				display: inline-flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 2px;
+				width: 26px;
+				position: relative;
+			}
+
+			.charm-item img {
+				width: 26px;
+				height: 26px;
+				border-radius: 4px;
+				object-fit: contain;
+				display: block;
+				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+			}
+
+			.charm-item .lv {
+				font-size: 11px;
+				font-weight: 700;
+				color: #475569;
+				line-height: 1;
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* ---------- Avatars ---------- */
+			.av {
+				position: relative;
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				background: #e5e7eb;
+				color: #6b7280;
+				font-weight: 700;
+				font-size: 14px;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				overflow: hidden;
+				flex: none;
+				border: 2px solid #fff;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+			}
+
+			.av img {
+				position: absolute;
+				inset: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.av.big {
+				width: 76px;
+				height: 76px;
+				font-size: 26px;
+				border-width: 3px;
+			}
+
+			/* ---------- Rank chips ---------- */
+			.rk {
+				display: inline-block;
+				font-size: 10px;
+				padding: 1px 6px;
+				border-radius: 999px;
+				background: #e2e8f0;
+				color: #475569;
+				font-weight: 700;
+				vertical-align: middle;
+				font-variant-numeric: tabular-nums;
+				flex: none;
+			}
+
+			.rk.r1 {
+				background: var(--gold);
+				color: #1a1400;
+			}
+
+			.rk.r2 {
+				background: var(--silver);
+				color: #1a1f26;
+			}
+
+			.rk.r3 {
+				background: var(--bronze);
+				color: #1a0f04;
+			}
+
+			.rk.top {
+				background: #d1fae5;
+				color: #065f46;
+			}
+
+			/* ---------- Hero / Governor Gear (Modal details) ---------- */
+			.gi {
+				width: 100%;
+				max-width: 56px;
+				aspect-ratio: 1;
+				border-radius: 8px;
+				background: #94a3b8;
+				border: 2.5px solid #94a3b8;
+				display: block;
+				margin: 0 auto;
+				object-fit: cover;
+				box-sizing: border-box;
+			}
+
+			.gi.t5r {
+				background: var(--t-red);
+				border-color: var(--t-red);
+			}
+
+			.gi.t5 {
+				background: var(--t-gold);
+				border-color: var(--t-gold);
+			}
+
+			.gi.t4 {
+				background: var(--t-violet);
+				border-color: var(--t-violet);
+			}
+
+			.gi.t3 {
+				background: var(--t-sky);
+				border-color: var(--t-sky);
+			}
+
+			.gi.t2 {
+				background: var(--t-green);
+				border-color: var(--t-green);
+			}
+
+			.gi.t1 {
+				background: var(--t-grey);
+				border-color: var(--t-grey);
+			}
+
+			.forge-badge {
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				z-index: 5;
+				display: inline-flex;
+				align-items: center;
+				gap: 2px;
+				background: rgba(15, 23, 42, 0.88);
+				color: #f8fafc;
+				font-size: 10px;
+				font-weight: 700;
+				line-height: 1;
+				padding: 1px 5px 1px 2px;
+				border-radius: 5px;
+				pointer-events: none;
+			}
+
+			.forge-badge img {
+				width: 14px;
+				height: 14px;
+				object-fit: contain;
+				display: block;
+				flex: none;
+			}
+
+			/* Fixed modal gear wrapper to contain stars */
+			.modal-gear-wrapper {
+				position: relative;
+				width: 64px;
+				height: 64px;
+				border-radius: 10px;
+				padding: 4px;
+				box-sizing: border-box;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-bottom: 14px;
+				z-index: 1;
+			}
+
+			.modal-gear-wrapper .gi2 {
+				width: 100%;
+				height: 100%;
+				border-radius: 7px;
+				background: transparent;
+				position: relative;
+				z-index: 2;
+				object-fit: cover;
+				display: block;
+			}
+
+			.modal-gear-wrapper .st {
+				position: absolute;
+				bottom: -18px;
+				left: 0;
+				right: 0;
+				text-align: center;
+				color: #f59e0b;
+				font-size: 15px;
+				letter-spacing: 0;
+				line-height: 1;
+				z-index: 3;
+				font-weight: 700;
+				pointer-events: none;
+			}
+
+			/* ---------- Key/value ---------- */
+			.kv>div {
+				display: flex;
+				justify-content: space-between;
+				gap: 12px;
+				padding: 7px 0;
+				border-bottom: 1px solid #eef2f6;
+				font-size: 13.5px;
+			}
+
+			.kv>div>span:first-child {
+				color: #6b7280;
+			}
+
+			.kv>div>span:last-child {
+				color: #111827;
+				font-weight: 500;
+				font-variant-numeric: tabular-nums;
+				text-align: right;
+				max-width: 55%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.chip {
+				background: #fff;
+				border: 1px solid #e5e7eb;
+				border-radius: 999px;
+				padding: 5px 12px;
+				font-size: 12.5px;
+				color: #6b7280;
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+			}
+
+			.chip b {
+				color: #111827;
+				font-weight: 600;
+			}
+
+			.player-link {
+				color: #4f46e5;
+				font-weight: 600;
+				text-decoration: none;
+				border-bottom: 1px solid rgba(79, 70, 229, 0.35);
+				cursor: pointer;
+			}
+
+			.player-link:hover {
+				color: #3730a3;
+				border-bottom-color: #3730a3;
+			}
+
+			/* ---------- Modal ---------- */
+			.modal-overlay {
+				position: fixed;
+				inset: 0;
+				background: rgba(15, 23, 42, .55);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity .2s, visibility .2s;
+				padding: 20px;
+			}
+
+			.modal-overlay.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-card {
+				background: #fff;
+				border-radius: 18px;
+				width: 100%;
+				max-width: 1100px;
+				max-height: 92vh;
+				overflow-y: auto;
+				box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .3);
+				transform: translateY(20px);
+				transition: transform .2s;
+			}
+
+			.modal-overlay.active .modal-card {
+				transform: translateY(0);
+			}
+
+			/* ---------- Toggle chips ---------- */
+			.chip-toggle {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				background: #fff;
+				border: 1.5px solid #e5e7eb;
+				border-radius: 999px;
+				padding: 5px 14px;
+				font-size: 12.5px;
+				color: #475569;
+				cursor: pointer;
+				user-select: none;
+				transition: all .15s;
+				font-weight: 500;
+			}
+
+			.chip-toggle:hover {
+				border-color: #a5b4fc;
+			}
+
+			.chip-toggle.on {
+				background: #eef2ff;
+				border-color: #4f46e5;
+				color: #4338ca;
+			}
+
+			.chip-toggle .dot {
+				width: 13px;
+				height: 13px;
+				border-radius: 50%;
+				border: 2px solid #94a3b8;
+				background: transparent;
+				position: relative;
+				flex: none;
+			}
+
+			.chip-toggle.on .dot {
+				border-color: #4f46e5;
+				background: #4f46e5;
+			}
+
+			.chip-toggle.on .dot::after {
+				content: '';
+				position: absolute;
+				inset: 2.5px;
+				border-radius: 50%;
+				background: #fff;
+			}
+
+			/* ---------- Spinner ---------- */
+			.spinner {
+				border: 4px solid #e5e7eb;
+				border-top: 4px solid #4f46e5;
+				border-radius: 50%;
+				width: 48px;
+				height: 48px;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* ---------- Section header ---------- */
+			.sec-h {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: .12em;
+				font-weight: 700;
+				color: #64748b;
+				margin-bottom: 14px;
+			}
+
+			.sec-h::before {
+				content: '';
+				width: 4px;
+				height: 16px;
+				background: #4f46e5;
+				border-radius: 3px;
+			}
+
+			.sec-h .hint {
+				font-size: 12px;
+				text-transform: none;
+				letter-spacing: 0;
+				font-weight: 400;
+				color: #94a3b8;
+			}
+
+		</style>
+	</head>
+
+	<body class="min-h-screen">
+		<!-- Header -->
+		<header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
+			<div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 flex items-center gap-4 flex-wrap">
+				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20">A</div>
+				<div class="min-w-0">
+					<h1 id="title" class="text-lg sm:text-xl font-bold leading-tight truncate">Alliance</h1>
+					<p class="text-xs text-slate-500 truncate" id="subtitle">Data viewer</p>
+				</div>
+				<div class="flex-1"></div>
+				<div class="flex items-center gap-2 text-xs text-slate-500">
+					<i class="fas fa-users text-slate-400"></i>
+					<span id="memberCount">0 members</span>
+				</div>
+			</div>
+		</header>
+		<!-- Loader -->
+		<div id="loader" class="p-8 hidden">
+			<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center">
+				<div class="spinner mx-auto mb-5"></div>
+				<p class="text-slate-500 text-sm">Loading alliance data…</p>
+			</div>
+		</div>
+		<!-- Main -->
+		<main id="page" class="max-w-[1600px] mx-auto p-4 sm:p-6 hidden">
+			<!-- Stat cards -->
+			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8" id="statGrid"></div>
+			<!-- Leaders -->
+			<div class="bg-white rounded-2xl shadow-sm mb-8 overflow-hidden">
+				<div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 flex-wrap">
+					<h2 class="text-base font-semibold">Leaderboard — top 3 per category</h2>
+					<span class="text-xs text-slate-500">Click a name to open the full dossier</span>
+				</div>
+				<div class="p-6 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" id="leaders"></div>
+			</div>
+			<!-- Members table -->
+			<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+				<div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
+					<div class="min-w-0">
+						<h2 class="text-base font-semibold">All members</h2>
+						<p class="text-xs text-slate-500">Click any row to open the full dossier</p>
+					</div>
+					<div class="flex-1"></div>
+					<div class="relative">
+						<input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+						<i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+					</div>
+					<button id="csv" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition">
+						<i class="fas fa-download"></i> Export CSV </button>
+				</div>
+				<div class="px-6 py-3 border-b border-slate-100 flex flex-wrap items-center gap-2">
+					<span class="text-xs text-slate-500">Overall rank = average across ticked categories:</span>
+					<div class="flex flex-wrap gap-2" id="overallcats"></div>
+				</div>
+				<div class="overflow-x-hidden overflow-y-auto max-h-[calc(100vh-280px)]">
+					<div id="tbl" class="grid-table"></div>
+				</div>
+			</div>
+		</main>
+		<footer class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 text-xs text-slate-500 border-t border-slate-200 mt-6" id="foot"></footer>
+		<!-- Drawer / Modal -->
+		<div class="modal-overlay" id="overlay">
+			<div class="modal-card" id="drawer" role="dialog" aria-modal="true"></div>
+		</div>
+		<script>
+			/* ------------------------------------------------------------------ */
+			/* State                                                               */
+			/* ------------------------------------------------------------------ */
+			let D = {},
+				NAMES = {
+					hero: {}
+				},
+				P = [];
+			const $ = (s, el = document) => el.querySelector(s);
+			const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				"'": '&#39;'
+			} [c] || c));
+			const dd = p => p.derived || {};
+			const fmtM = n => n == null ? '-' : n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
+			const fmtN = n => n == null ? '-' : Number(n).toLocaleString('en-US');
+			const pct = n => n == null || isNaN(n) ? '-' : (n > 0 ? '+' : '') + Number(n).toFixed(1) + '%';
+			const img = (src, cls) => src ? '<img src="' + esc(src) + '" class="' + (cls || '') + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
+			const timeAgo = s => {
+				if (!s) return '-';
+				try {
+					const d = new Date(s);
+					const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+					if (days <= 0) return 'today';
+					return days + 'd ago';
+				} catch {
+					return s;
+				}
+			};
+			/* ------------------------------------------------------------------ */
+			/* Hero helpers                                                       */
+			/* ------------------------------------------------------------------ */
+			const heroIcon = id => 'images/kingshot/heroes/hero_headpic_' + id + '.png';
+			const heroName = id => (NAMES.hero && NAMES.hero[String(id)]) || 'Unknown hero';
+			/* ------------------------------------------------------------------ */
+			/* Governor gear helpers                                              */
+			/* ------------------------------------------------------------------ */
+			const GOV_BLOCKS = [
+				[3, 'Rare', 0],
+				[7, 'Epic', 0],
+				[11, 'Epic', 1],
+				[15, 'Mythic', 0],
+				[19, 'Mythic', 1],
+				[23, 'Mythic', 2],
+				[27, 'Mythic', 3],
+				[31, 'Legendary', 0],
+				[35, 'Legendary', 1],
+				[39, 'Legendary', 2],
+				[43, 'Legendary', 3]
+			];
+
+			function govCode(g) {
+				if (g.progress != null && !isNaN(Number(g.progress))) return Number(g.progress);
+				const e = Number(g.equip_id) || 0;
+				if (!e) return null;
+				let c = e % 1000;
+				if (c >= 100) c = c % 100;
+				return c;
+			}
+
+			function govDecode(c) {
+				if (c == null) return null;
+				if (c <= 2) return {
+					quality: 'Uncommon',
+					tier: 0,
+					stars: 0
+				};
+				let b = GOV_BLOCKS[0];
+				for (const x of GOV_BLOCKS)
+					if (c >= x[0]) b = x;
+				return {
+					quality: b[1],
+					tier: b[2],
+					stars: Math.min(3, c - b[0])
+				};
+			}
+
+			function govLabelOf(d) {
+				return d ? d.quality + (d.tier ? ' T' + d.tier : '') + (d.stars ? ' · ' + d.stars + '★' : '') : '-';
+			}
+
+			function govProgress(p) {
+				const cs = (p.governor_gear || []).map(govCode).filter(c => c != null);
+				return cs.length ? cs.reduce((a, b) => a + b, 0) : null;
+			}
+			const Q_SUFFIX_TO_QUALITY = {
+				"1": 'uncommon',
+				"2": 'rare',
+				"3": 'epic',
+				"4": 'mythic',
+				"5": 'legendary',
+				"7": 'mythic'
+			};
+			const ICON_RE = /lordsequipment_icon_\d+(\d)\.png$/;
+
+			function qualityFromIcon(p) {
+				if (!p) return null;
+				const m = ICON_RE.exec(String(p).replace(/\\/g, '/'));
+				return m ? (Q_SUFFIX_TO_QUALITY[m[1]] || null) : null;
+			}
+
+			function govQuality(g) {
+				const raw = (g.quality || '').toLowerCase().trim();
+				if (raw === 'legendary' || raw === 'mythic' || raw === 'epic' || raw === 'rare' || raw === 'uncommon') {
+					return raw;
+				}
+				const qIcon = qualityFromIcon(g.icon);
+				if (qIcon) return qIcon;
+				const dq = govDecode(govCode(g));
+				if (dq) return dq.quality.toLowerCase();
+				return 'unknown';
+			}
+
+			function govQualityClass(g) {
+				switch (govQuality(g)) {
+					case 'legendary':
+						return 'q-legendary';
+					case 'mythic':
+						return 'q-mythic';
+					case 'epic':
+						return 'q-epic';
+					case 'rare':
+						return 'q-rare';
+					case 'uncommon':
+						return 'q-uncommon';
+					default:
+						return 'q-unknown';
+				}
+			}
+
+			function govIconPath(g) {
+				if (g.icon && qualityFromIcon(g.icon)) return g.icon;
+				const eid = Number(g.equip_id) || 0;
+				if (!eid) return g.icon || null;
+				const piece = Math.floor(eid / 1000);
+				const q = govQuality(g);
+				const _d = govDecode(govCode(g));
+				const tier = _d ? (_d.tier || 1) : (Number(g.tier) || 1);
+				let digit = null;
+				if (q === 'legendary') digit = 5;
+				else if (q === 'mythic') digit = tier >= 2 ? 7 : 4;
+				else if (q === 'epic') digit = 3;
+				else if (q === 'rare') digit = 2;
+				else if (q === 'uncommon') digit = 1;
+				if (digit != null) return 'images/kingshot/lord-gear/lordsequipment_icon_' + piece + '00' + digit + '.png';
+				return g.icon || null;
+			}
+			/* ------------------------------------------------------------------ */
+			/* Categories                                                         */
+			/* ------------------------------------------------------------------ */
+			const CATS = [{
+				id: 'combat',
+				label: 'Combat power',
+				get: p => p.combatPower,
+				fmt: fmtM,
+				icon: 'fa-bolt'
+			}, {
+				id: 'heroPower',
+				label: 'Hero power',
+				get: p => p.heroPower,
+				fmt: fmtM,
+				icon: 'fa-star'
+			}, {
+				id: 'troops',
+				label: 'Troops',
+				get: p => (p.troops && Object.keys(p.troops).length) ? dd(p).troop_score : null,
+				fmt: null,
+				cell: 'troops',
+				icon: 'fa-users-rectangle'
+			}, {
+				id: 'gov',
+				label: 'Governor gear',
+				get: p => govProgress(p),
+				fmt: null,
+				cell: 'gov',
+				icon: 'fa-shield-halved'
+			}, {
+				id: 'charm',
+				label: 'Charms',
+				get: p => (p.governor_gear && p.governor_gear.length) ? dd(p).charm_level_sum_guess : null,
+				fmt: fmtN,
+				cell: 'charm',
+				icon: 'fa-diamond'
+			}];
+			const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+			const TROOPS = ['infantry', 'cavalry', 'archers'];
+			const state = {
+				sortKey: 'overall',
+				sortDir: 1,
+				search: '',
+				overall: new Set(CATS.map(c => c.id))
+			};
+			let RK = {},
+				OV = {},
+				OP = {};
+
+			function ranksFrom(pairs) {
+				const o = {};
+				let r = 0,
+					prev = null,
+					i = 0;
+				pairs.sort((a, b) => b[1] - a[1]);
+				for (const [k, v] of pairs) {
+					i++;
+					if (v !== prev) {
+						r = i;
+						prev = v;
+					}
+					o[k] = r;
+				}
+				return o;
+			}
+
+			function compute() {
+				RK = {};
+				for (const c of CATS) RK[c.id] = ranksFrom(P.map(p => [p.fid, c.get(p)]).filter(x => x[1] != null && !isNaN(x[1])));
+				OV = {};
+				for (const p of P) {
+					const rs = [...state.overall].map(id => RK[id][p.fid]).filter(x => x != null);
+					OV[p.fid] = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
+				}
+				const ord = P.map(p => [p.fid, OV[p.fid]]).filter(x => x[1] != null).sort((a, b) => a[1] - b[1]);
+				OP = {};
+				let r = 0,
+					prev = null,
+					i = 0;
+				for (const [k, v] of ord) {
+					i++;
+					if (v !== prev) {
+						r = i;
+						prev = v;
+					}
+					OP[k] = r;
+				}
+			}
+			const byFid = fid => P.find(p => p.fid === fid);
+			/* ------------------------------------------------------------------ */
+			/* Rendering helpers                                                  */
+			/* ------------------------------------------------------------------ */
+			function rankChip(r) {
+				return r == null ? '' : '<span class="rk ' + (r <= 3 ? 'r' + r : (r <= 10 ? 'top' : '')) + '">#' + r + '</span>';
+			}
+
+			function avatar(p, big) {
+				const letter = esc((p.nickname || '?').trim().charAt(0).toUpperCase());
+				const im = p.avatar_img ? '<img src="' + esc(p.avatar_img) + '" alt="" onerror="this.remove()">' : '';
+				return '<div class="av ' + (big ? 'big' : '') + '"><span>' + letter + '</span>' + im + '</div>';
+			}
+
+			function troopCell(p) {
+				const t = p.troops || {};
+				const parts = TROOPS.filter(k => t[k]).map(k => '<span class="troop-pill" title="' + k + ' · ' + t[k].label + '">' + img(t[k].icon, '') + '<span class="tt">T' + t[k].tier + '</span>' + (t[k].tg != null ? '<span class="tg">TG' + t[k].tg + '</span>' : '') + '</span>');
+				return parts.length ? '<div class="troop-cell">' + parts.join('') + '</div>' : '<span class="text-slate-400">-</span>';
+			}
+
+			function govLabel(p) {
+				const gears = p.governor_gear || [];
+				if (!gears.length) return '-';
+				const Q_ORDER = {
+					uncommon: 0,
+					rare: 1,
+					epic: 2,
+					mythic: 3,
+					legendary: 4
+				};
+				let best = null;
+				for (const g of gears) {
+					const q = (g.quality || '').toLowerCase().trim();
+					if (!q && !g.label) continue;
+					const tier = Number(g.tier) || 0;
+					const stars = Number(g.stars) || 0;
+					const score = (Q_ORDER[q] != null ? Q_ORDER[q] : -1) * 100 + tier * 10 + stars;
+					if (!best || score > best.score) {
+						best = {
+							score,
+							label: g.label || (q ? (q.charAt(0).toUpperCase() + q.slice(1) + (tier ? ' T' + tier : '') + (stars ? ' · ' + stars + '★' : '')) : null)
+						};
+					}
+				}
+				if (best && best.label) return best.label;
+				const cs = gears.map(govCode).filter(c => c != null);
+				if (!cs.length) return '-';
+				return govLabelOf(govDecode(Math.round(cs.reduce((a, b) => a + b, 0) / cs.length)));
+			}
+			/* 6 governor-gear tiles in a single row — colored frame + star row + tier */
+			function govGearImages(p) {
+				const gears = p.governor_gear || [];
+				if (!gears.length) return '<span class="text-slate-400">-</span>';
+				const tiles = gears.map(g => {
+					const iconPath = govIconPath(g);
+					if (!iconPath) return '<div class="gear-tile"><span class="text-slate-400 text-[10px]">-</span></div>';
+					const qc = govQualityClass(g);
+					const dec = govDecode(govCode(g));
+					let stars = 0;
+					let tier = 0;
+					if (dec) {
+						stars = dec.stars || 0;
+						tier = dec.tier || 0;
+					} else {
+						stars = Number(g.stars) || 0;
+						tier = Number(g.tier) || 0;
+					}
+					const starRow = '<span class="stars">' + (stars > 0 ? '★'.repeat(stars) : '\u00a0') + '</span>';
+					const tierRow = '<span class="tier">' + (tier > 0 ? 'T' + tier : '\u00a0') + '</span>';
+					const tip = (g.name || '') + ' · ' + (g.label || govQuality(g));
+					return '<div class="gear-tile" title="' + esc(tip) + '">' + '<div class="gear-frame ' + qc + '"><img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15"></div>' + starRow + tierRow + '</div>';
+				}).join('');
+				return '<div class="gear-icon-grid">' + tiles + '</div>';
+			}
+			/* 18 charm icons as 2 rows × 3 columns, each with its level under it */
+			function govCharmImages(p) {
+				const gears = p.governor_gear || [];
+				if (!gears.length) return '<span class="text-slate-400">-</span>';
+				let html = '<div class="charm-icon-grid">';
+				for (let i = 0; i < 6; i++) {
+					const g = gears[i];
+					const charms = (g && g.charms) || [];
+					const groups = charms.map(c => '<span class="charm-item" title="Lv' + c.level_guess + ' · raw ' + c.raw + '">' + '<img src="' + esc(c.icon) + '" alt="" onerror="this.style.opacity=.15">' + '<span class="lv">' + c.level_guess + '</span>' + '</span>').join('');
+					html += '<div class="charm-group">' + (groups || '<span class="text-slate-300 text-[10px]">-</span>') + '</div>';
+				}
+				html += '</div>';
+				return html;
+			}
+
+			function cellHTML(c, p) {
+				const v = c.get(p);
+				if (v == null) return '<span class="text-slate-400">-</span>';
+				const rk = rankChip(RK[c.id][p.fid]);
+				if (c.cell === 'troops') {
+					return '<div class="cell-main">' + troopCell(p) + rk + '</div>';
+				}
+				if (c.cell === 'gov') {
+					return '<div class="cell-main">' + govGearImages(p) + rk + '</div>';
+				}
+				if (c.cell === 'charm') {
+					return '<div class="cell-main">' + govCharmImages(p) + rk + '</div>';
+				}
+				return '<div class="cell-main"><span class="cell-val">' + c.fmt(v) + '</span>' + rk + '</div>';
+			}
+			/* ------------------------------------------------------------------ */
+			/* Table                                                              */
+			/* ------------------------------------------------------------------ */
+			function tableRows() {
+				const q = state.search;
+				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().includes(q));
+				const k = state.sortKey;
+				const val = p => {
+					if (k === 'overall') return OV[p.fid];
+					if (k === 'name') return (p.nickname || '').toLowerCase();
+					return CAT[k].get(p);
+				};
+				rows.sort((a, b) => {
+					const x = val(a),
+						y = val(b);
+					if (x == null && y == null) return 0;
+					if (x == null) return 1;
+					if (y == null) return -1;
+					return (x < y ? -1 : x > y ? 1 : 0) * state.sortDir;
+				});
+				return rows;
+			}
+
+			function renderTable() {
+				const rows = tableRows();
+				const th = (key, label, cls) => `<div class="grid-cell grid-header ${cls||''} ${state.sortKey===key?'text-indigo-600':''}" data-k="${key}">${label} ${state.sortKey===key?(state.sortDir>0?'▲':'▼'):''}</div>`;
+				const shortLabels = {
+					combat: 'Combat',
+					heroPower: 'Hero pwr',
+					troops: 'Troops',
+					gov: 'Gov gear',
+					charm: 'Charms'
+				};
+				let h = `<div class="grid-row grid-header">` + th('overall', 'Rank', 'rank') + th('name', 'Player', 'pl') + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join('') + `</div>`;
+				for (const p of rows) {
+					const leads = (p.lead || []).map(l => {
+						const name = heroName(l.id);
+						const wl = l.widgetLevel != null ? ' · W' + l.widgetLevel : '';
+						const im = `<img src="${esc(heroIcon(l.id))}" alt="" onerror="this.style.opacity=0.15">`;
+						return `<span class="lead-chip" title="${esc(name)}${l.widgetLevel != null ? ' · Widget level ' + l.widgetLevel : ''}">${im} ${esc(name)}${wl}</span>`;
+					}).join('');
+					h += `<div class="grid-row" data-f="${p.fid}">
+      <div class="grid-cell rank font-bold text-indigo-700">${OP[p.fid]!=null?'#'+OP[p.fid]:'-'}</div>
+      <div class="grid-cell pl">
+        <div class="flex items-center gap-3">
+          ${avatar(p)}
+          <div class="min-w-0" style="overflow:hidden">
+            <div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nickname)}</div>
+            ${leads ? '<div class="lead-row">' + leads + '</div>' : ''}
+          </div>
+        </div>
+      </div>
+      ${CATS.map(c=>`<div class="grid-cell" title="${esc(c.label)}">${cellHTML(c,p)}</div>`).join('')}
+    </div>`;
+				}
+				$('#tbl').innerHTML = h;
+			}
+			/* ------------------------------------------------------------------ */
+			/* Stat cards                                                          */
+			/* ------------------------------------------------------------------ */
+			function renderStats() {
+				const total = P.length;
+				const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+				const combats = P.map(p => p.combatPower).filter(x => x != null);
+				const furnaces = P.map(p => p.furnaceLevel).filter(x => x != null);
+				const islandPros = P.map(p => (p.island || {}).prosperity).filter(x => x != null);
+				const champKills = P.map(p => (p.championship || {}).killed).filter(x => x != null);
+				const top = [...P].sort((a, b) => b.combatPower - a.combatPower)[0];
+				const oldest = P.filter(p => p.ageDays != null).sort((a, b) => b.ageDays - a.ageDays)[0];
+				const card = (label, value, sub, icon, color) => `
+    <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">${label}</div>
+          <div class="text-2xl font-bold mt-1 tabular-nums">${value}</div>
+          <div class="text-[11.5px] text-slate-500 mt-1 truncate">${sub}</div>
+        </div>
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none ${color}">
+          <i class="fas ${icon} text-xl"></i>
+        </div>
+      </div>
+    </div>`;
+				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max(...furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Island prosperity', fmtM(islandPros.reduce((a, b) => a + b, 0)), 'avg <b>' + fmtM(Math.round(avg(islandPros))) + '</b>', 'fa-umbrella-beach', 'bg-emerald-100 text-emerald-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
+			}
+			/* ------------------------------------------------------------------ */
+			/* Leaders                                                            */
+			/* ------------------------------------------------------------------ */
+			function renderLeaders() {
+				$('#leaders').innerHTML = CATS.map(c => {
+					const top = P.map(p => [p, c.get(p)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 3);
+					const disp = p => c.id === 'troops' ? TROOPS.map(k => p.troops && p.troops[k] ? 'T' + p.troops[k].tier : '-').join('/') : c.id === 'gov' ? govLabel(p) : c.fmt(c.get(p));
+					return '<div class="bg-slate-50 rounded-xl p-4 border border-slate-100">' + '<h3 class="text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3 flex items-center gap-2"><i class="fas ' + c.icon + ' text-indigo-500"></i>' + esc(c.label) + '</h3>' + top.map(([p]) => '<div class="flex justify-between items-center py-1.5 text-[13px] cursor-pointer hover:text-indigo-600 border-b border-slate-100 last:border-0" data-f="' + p.fid + '"><span class="truncate font-medium">' + esc(p.nickname) + '</span><span class="text-slate-500 tabular-nums ml-2">' + disp(p) + '</span></div>').join('') + '</div>';
+				}).join('');
+			}
+
+			function renderCatToggles() {
+				$('#overallcats').innerHTML = CATS.map(c => '<label class="chip-toggle ' + (state.overall.has(c.id) ? 'on' : '') + '"><input type="checkbox" data-c="' + c.id + '" class="hidden" ' + (state.overall.has(c.id) ? 'checked' : '') + '><span class="dot"></span>' + esc(c.label) + '</label>').join('');
+			}
+			/* ------------------------------------------------------------------ */
+			/* Detail drawer sections                                             */
+			/* ------------------------------------------------------------------ */
+			function sec(title, body, hint) {
+				return '<div class="mb-7"><h3 class="sec-h">' + esc(title) + (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</h3>' + body + '</div>';
+			}
+
+			function kvBlock(entries) {
+				const rows = entries.filter(e => e && e[1] != null && e[1] !== '').map(([k, v]) => '<div><span>' + esc(k) + '</span><span>' + esc(v) + '</span></div>').join('');
+				return rows ? '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>' : '';
+			}
+
+			function coreBlock(p) {
+				return sec('Overview', kvBlock([
+					['Nickname', p.nickname],
+					['Player ID', p.fid || (p.spec && p.spec['Player ID'])],
+					['Inactive', p.inactive ? 'Yes' : 'No'],
+					['Combat power', fmtM(p.combatPower)],
+					['Total power', p.power != null ? fmtM(p.power) : null],
+					['Hero power', fmtM(p.heroPower)],
+					['Furnace (Town Center)', p.furnaceLevel],
+					['Life tree level', p.lifeTreeLevel],
+					['Strat score', p.stratScore],
+					['Score', p.score],
+					['Confidence', p.confidence],
+					['Source', p.source],
+					['Office', p.office],
+					['Alliance rank', p.rank != null ? '#' + p.rank : null],
+					['Kingdom rank', p.kingdom_rank ? ('#' + p.kingdom_rank.rank + ' / ' + p.kingdom_rank.of) : null],
+					['Marksman attack', pct(p.marksmanAttackPct)],
+					['Marksman lethality', pct(p.marksmanLethalityPct)],
+					['Rally attack', p.rallyWidget ? pct(p.rallyWidget.attackPct) : null],
+					['Rally lethality', p.rallyWidget ? pct(p.rallyWidget.lethalityPct) : null],
+					['Capacity', p.capacity != null ? (fmtM(p.capacity) + (p.capacityExact ? '' : ' (est)')) : null],
+					['March share', p.marchShare != null ? (p.marchShare * 100).toFixed(1) + '%' : null],
+					['Capacity share', p.capacityShare != null ? (p.capacityShare * 100).toFixed(1) + '%' : null],
+					['Data as of', p.asOf ? timeAgo(p.asOf) : null],
+					['Data age', p.ageDays != null ? (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old') : null]
+				]));
+			}
+
+			function leadBlock(p) {
+				const lead = p.lead || [];
+				if (!lead.length) return '';
+				const chips = lead.map(l => {
+					const im = '<img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15">';
+					return '<span class="chip">' + im + '<b>' + esc(heroName(l.id)) + '</b>' + (l.widgetLevel != null ? ' · widget <b>' + l.widgetLevel + '</b>' : '') + '</span>';
+				}).join('');
+				return sec('Lead heroes', '<div class="flex flex-wrap gap-2.5">' + chips + '</div>');
+			}
+
+			function troopsBlock(p) {
+				const t = p.troops || {};
+				if (!Object.keys(t).length) return sec('Troops', '<div class="text-slate-400 text-sm">No troop data.</div>');
+				const cards = TROOPS.filter(k => t[k]).map(k => {
+					const tk = t[k];
+					return '<div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">' + img(tk.icon, 'w-14 h-14 rounded-lg') + '<div><div class="text-sm font-semibold capitalize">' + esc(k) + '</div><div class="text-[11.5px] text-slate-500">Tier ' + tk.tier + ' · TG ' + tk.tg + '</div></div>' + '</div>';
+				}).join('');
+				return sec('Troops (top tier per type)', '<div class="flex flex-wrap gap-3">' + cards + '</div>');
+			}
+
+			function heroGearClass(g) {
+				const t = Number(g.tier),
+					e = Number(g.enhance) || 0;
+				if (t === 5) return e > 100 ? 'gi t5r' : 'gi t5';
+				if (t === 4) return 'gi t4';
+				if (t === 3) return 'gi t3';
+				if (t === 2) return 'gi t2';
+				return 'gi t1';
+			}
+
+			function heroHTML(h) {
+				const gear = (h.gear || []).map(g => {
+					const tip = (g.name || 'Gear') + ' · Forge ' + g.refine + ' · Lv' + g.enhance_level + (g.enhance_plus ? ' +' + g.enhance_plus : '') + (g.exp != null ? ' · XP ' + g.exp : '');
+					const forge = (g.refine != null && g.refine > 0) ? '<span class="forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">' + g.refine + '</span>' : '';
+					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + (g.enhance_level ?? 0) + (g.enhance_plus ? '<b class="text-emerald-600">+' + g.enhance_plus + '</b>' : '') + '</span>' + (g.name ? '<span class="block text-[9px] text-slate-400 truncate mt-0.5" style="max-width:64px;margin:0 auto">' + esc(g.name) + '</span>' : '') + '</div>';
+				}).join('');
+				const ex = h.exclusive ? ' · Exclusive Lv' + h.exclusive.level : '';
+				const skills = (h.skills || []).map(s => esc(s.name || ('Skill ' + s.id)) + ' Lv' + (s.level ?? 0)).join(' · ');
+				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col">' + '<div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(heroName(h.hero_id) || h.name || ('Hero ' + h.hero_id)) + '</div>' + '<div class="text-[12px] text-slate-500">' + (h.star ?? 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div></div>' + '<div class="text-[11px] text-slate-500 mb-2 truncate" title="' + skills + '" style="min-height:16px">' + (skills || '') + '</div>' + '<div class="grid grid-cols-4 gap-2 mt-auto">' + gear + '</div></div>';
+			}
+
+			function heroesBlock(p) {
+				const hs = p.heroes || [];
+				return hs.length ? sec('Heroes & hero gear', '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + hs.map(heroHTML).join('') + '</div>') : '';
+			}
+
+			function govHTML(g) {
+				const ch = (g.charms || []).map(c => '<div class="text-center w-12" title="Charm · raw ' + c.raw + ' · level guess ' + c.level_guess + '">' + img(c.icon, 'w-11 h-11 mx-auto rounded') + '<span class="block text-[12px] text-slate-600 font-bold tabular-nums mt-1">' + c.level_guess + '</span></div>').join('');
+				const qc = govQualityClass(g);
+				const iconPath = govIconPath(g);
+				const imgs = iconPath ? '<img src="' + esc(iconPath) + '" class="gi2" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
+				const _dv = govDecode(govCode(g));
+				const nstars = _dv ? _dv.stars : (g.stars || 0);
+				const stars = nstars ? '<span class="st">' + '★'.repeat(nstars) + '</span>' : '';
+				const label = g.label || (_dv ? govLabelOf(_dv) : (g.quality || ''));
+				return '<div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5">' + '<div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div>' + '<div class="flex-1 min-w-0">' + '<div class="text-[15px] font-semibold truncate">' + esc(g.name || 'Gear piece') + '</div>' + '<div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + '</div>' + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5">ID ' + g.equip_id + (g.progress != null ? ' · progress ' + g.progress : '') + '</div>' : '') + '</div>' + '<div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + '</div></div>';
+			}
+
+			function govBlock(p) {
+				const g = p.governor_gear || [];
+				if (!g.length) return '';
+				return sec('Governor gear & charms', '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + g.map(govHTML).join('') + '</div>', '(charm levels estimated)');
+			}
+
+			function boardsBlock(p) {
+				const bs = p.board_standings || [];
+				return bs.length ? sec('Kingdom standings', kvBlock(bs.map(b => [b.label, '#' + b.rank + ' · ' + b.value]))) : '';
+			}
+
+			function powerBlock(p) {
+				const pb = p.power_breakdown || {};
+				return Object.keys(pb).length ? sec('Power breakdown' + (p.power_summary ? ' <span class="hint">' + esc(p.power_summary) + '</span>' : ''), kvBlock(Object.entries(pb))) : '';
+			}
+
+			function specBlock(p) {
+				const s = p.spec || {};
+				return Object.keys(s).length ? sec('Spec', kvBlock(Object.entries(s))) : '';
+			}
+
+			function marchBlock(p) {
+				const m = p.march_stats || {};
+				if (!Object.keys(m).length) return '';
+				const types = ['infantry', 'cavalry', 'archer'];
+				const stats = ['attack', 'defense', 'lethality', 'health'];
+				const tbl = '<div class="overflow-auto rounded-xl border border-slate-100"><table class="w-full text-sm"><thead><tr><th class="bg-slate-50 px-4 py-3 text-left text-[11px] uppercase tracking-wider text-slate-500"></th>' + types.map(t => '<th class="bg-slate-50 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">' + esc(t) + '</th>').join('') + '</tr></thead><tbody>' + stats.map(s => '<tr><td class="px-4 py-2.5 text-slate-500 capitalize border-t border-slate-100">' + s + '</td>' + types.map(t => '<td class="px-4 py-2.5 text-center border-t border-slate-100 tabular-nums font-medium">' + esc((m[s] || {})[t] || '-') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+				return sec('March stats', tbl);
+			}
+
+			function champBlock(p) {
+				const c = p.championship || {};
+				if (!Object.keys(c).length) return '';
+				const entries = [
+					['Season', c.season],
+					['Brought', c.brought != null ? fmtN(c.brought) : null],
+					['Killed', c.killed != null ? fmtN(c.killed) : null],
+					['Lost', c.lost != null ? fmtN(c.lost) : null],
+					['Wounded', c.wounded != null ? fmtN(c.wounded) : null],
+					['Power lost', c.power_lost],
+					['Advisor', c.advisor],
+					['Advisor level', c.advisor_level]
+				];
+				if (c.troops) Object.entries(c.troops).forEach(([k, v]) => entries.push(['Troops: ' + k, fmtN(v)]));
+				return sec('Championship', kvBlock(entries));
+			}
+
+			function islandBlock(p) {
+				const i = p.island || {};
+				if (!Object.keys(i).length) return '';
+				const b = Object.entries(i.bonuses || {});
+				return sec('Island <span class="hint">prosperity ' + fmtN(i.prosperity) + ' · ' + fmtN(i.likes) + ' likes</span>', b.length ? kvBlock(b) : '<div class="text-slate-400 text-sm">No bonuses.</div>');
+			}
+
+			function normName(s) {
+				return String(s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+			}
+
+			function findPlayerByName(name) {
+				const n = normName(name);
+				if (!n || n === '(this player)') return null;
+				return P.find(p => normName(p.nickname) === n) || null;
+			}
+
+			function playerLink(name, extraClass) {
+				const hit = findPlayerByName(name);
+				if (!hit) return '<span>' + esc(name) + '</span>';
+				return '<a href="#" class="player-link ' + (extraClass || '') + '" data-f="' + esc(hit.fid) + '" title="Open ' + esc(hit.nickname) + '">' + esc(name) + '</a>';
+			}
+
+			function compBlock(p) {
+				const c = p.competition || [];
+				if (!c.length) return '';
+				const rows = c.map(x => {
+					const isSelf = normName(x.name) === normName(p.nickname) || String(x.power || '').includes('this player');
+					const nameHtml = isSelf ? '<span class="font-semibold text-indigo-700">' + esc(x.name) + '</span>' : playerLink(x.name);
+					return '<div><span>#' + esc(x.rank) + ' ' + nameHtml + '</span><span>' + esc(x.power) + '</span></div>';
+				}).join('');
+				return sec('Competition', '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>');
+			}
+
+			function linkedBlock(p) {
+				const l = p.linked_accounts || [];
+				if (!l.length) return '';
+				const rows = l.map(a => {
+					const label = playerLink(a.name) + ' · ' + esc(a.kingdom || '') + ' · ' + esc(a.tc || '');
+					return '<div><span>' + label + '</span><span>' + esc(a.power) + '</span></div>';
+				}).join('');
+				return sec('Linked accounts', '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>');
+			}
+
+			function worldBlock(p) {
+				const w = p.world_position || {};
+				const ev = p.open_events || [];
+				if (!Object.keys(w).length && !ev.length) return '';
+				const chips = (w.x != null ? '<span class="chip">Position <b>' + w.x + ',' + w.y + '</b></span>' : '') + (w.shield ? '<span class="chip">Shield <b>' + esc(w.shield) + '</b></span>' : '');
+				const evs = ev.length ? kvBlock(ev.map(e => [e.type, e.x + ',' + e.y])) : '';
+				return sec('World', '<div class="flex flex-wrap gap-2 mb-2">' + chips + '</div>' + evs);
+			}
+
+			function identityBlock(p) {
+				const h = p.identity_history || [];
+				if (!h.length) return '';
+				const rows = h.map(ev => {
+					if (ev.event === 'Moved') return ['Moved', (ev.from || '') + ' → ' + (ev.to || '') + (ev.when ? ' · ' + ev.when : '')];
+					return [ev.event || 'Event', ev.when || ''];
+				});
+				return sec('Identity history', kvBlock(rows));
+			}
+
+			function loadoutBlock(p) {
+				const l = p.loadout || {};
+				if (!Object.keys(l).length) return '';
+				return sec('Loadout', kvBlock([
+					['Gear upgraded', l.gear_upgraded ? 'Yes' : null],
+					['Heroes seen', l.heroes_seen],
+					['Deployed', l.deployed]
+				]));
+			}
+
+			function derivedBlock(p) {
+				const d = p.derived || {};
+				if (!Object.keys(d).length) return '';
+				return sec('Derived totals', kvBlock([
+					['Hero gear pieces', d.hero_gear_pieces],
+					['Hero gear forge total', d.hero_gear_refine_total],
+					['Hero gear enhance total', d.hero_gear_enhance_total],
+					['Hero gear tier total', d.hero_gear_tier_total],
+					['Hero gear XP total', d.hero_gear_exp_total != null ? fmtN(d.hero_gear_exp_total) : null],
+					['Hero star total', d.hero_star_total],
+					['Exclusive level total', d.exclusive_level_total],
+					['Gov stars total', d.gov_stars_total],
+					['Gov tier total', d.gov_tier_total],
+					['Gov progress', d.gov_progress],
+					['Charm count', d.charm_count],
+					['Charm level sum (est.)', d.charm_level_sum_guess],
+					['Troop score', d.troop_score]
+				]));
+			}
+
+			function chipsBlock(p) {
+				return '<div class="flex flex-wrap gap-2 mb-6">' + CATS.map(c => RK[c.id][p.fid] != null ? '<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>' : '').join('') + (OP[p.fid] != null ? '<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>' : '') + '</div>';
+			}
+
+			function detailBody(p) {
+				return chipsBlock(p) + coreBlock(p) + leadBlock(p) + troopsBlock(p) + heroesBlock(p) + govBlock(p) + derivedBlock(p) + boardsBlock(p) + powerBlock(p) + specBlock(p) + marchBlock(p) + champBlock(p) + islandBlock(p) + compBlock(p) + linkedBlock(p) + worldBlock(p) + identityBlock(p) + loadoutBlock(p);
+			}
+			/* ------------------------------------------------------------------ */
+			/* Drawer                                                              */
+			/* ------------------------------------------------------------------ */
+			function openPlayer(fid) {
+				const p = byFid(fid);
+				if (!p) return;
+				const meta = ['Combat ' + fmtM(p.combatPower), 'Hero power ' + fmtM(p.heroPower), 'Furnace ' + (p.furnaceLevel != null ? p.furnaceLevel : '-'),
+					p.kingdom_rank ? ('Kingdom #' + p.kingdom_rank.rank + '/' + p.kingdom_rank.of) : null,
+					p.ageDays != null ? ('data ' + (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old')) : null
+				].filter(Boolean).join(' · ');
+				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(meta) + '</div></div>' + '<button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button>' + '</div>' + '<div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
+				$('#overlay').classList.add('active');
+				document.body.style.overflow = 'hidden';
+				$('#drawerClose').onclick = closeDrawer;
+				$('#drawer').scrollTop = 0;
+			}
+
+			function closeDrawer() {
+				$('#overlay').classList.remove('active');
+				document.body.style.overflow = '';
+			}
+			/* ------------------------------------------------------------------ */
+			/* CSV export                                                          */
+			/* ------------------------------------------------------------------ */
+			function csvCell(v) {
+				if (v == null) return '';
+				v = String(v);
+				return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+			}
+
+			function exportCSV() {
+				const head = ['Overall rank', 'Player', 'Combat power', 'Hero power', 'Furnace level', 'Life tree level', 'Strat score', 'Champ kills', 'Champ lost', 'Island prosperity', 'Island likes', 'Kingdom rank'];
+				const lines = [head.map(csvCell).join(',')];
+				for (const p of tableRows()) {
+					const c = p.championship || {};
+					const i = p.island || {};
+					lines.push([OP[p.fid], p.nickname, p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore,
+						c.killed, c.lost, i.prosperity, i.likes, (p.kingdom_rank || {}).rank
+					].map(csvCell).join(','));
+				}
+				const blob = new Blob(['\ufeff' + lines.join('\r\n')], {
+					type: 'text/csv;charset=utf-8'
+				});
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(blob);
+				a.download = ((D.alliance && D.alliance.abbr) || 'alliance') + '_data.csv';
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+			}
+			/* ------------------------------------------------------------------ */
+			/* Refresh                                                            */
+			/* ------------------------------------------------------------------ */
+			function refresh() {
+				compute();
+				renderStats();
+				renderTable();
+				renderLeaders();
+				renderCatToggles();
+			}
+			/* ------------------------------------------------------------------ */
+			/* Events                                                             */
+			/* ------------------------------------------------------------------ */
+			$('#csv').onclick = exportCSV;
+			$('#q').oninput = e => {
+				state.search = e.target.value.trim().toLowerCase();
+				renderTable();
+			};
+			$('#tbl').addEventListener('click', e => {
+				const th = e.target.closest('.grid-header');
+				if (th) {
+					const k = th.dataset.k;
+					if (state.sortKey === k) state.sortDir *= -1;
+					else {
+						state.sortKey = k;
+						state.sortDir = (k === 'overall' || k === 'name') ? 1 : -1;
+					}
+					renderTable();
+					return;
+				}
+				const tr = e.target.closest('.grid-row[data-f]');
+				if (tr) openPlayer(tr.dataset.f);
+			});
+			$('#leaders').addEventListener('click', e => {
+				const r = e.target.closest('[data-f]');
+				if (r) openPlayer(r.dataset.f);
+			});
+			$('#overallcats').addEventListener('change', e => {
+				const id = e.target.dataset.c;
+				if (!id) return;
+				e.target.checked ? state.overall.add(id) : state.overall.delete(id);
+				if (!state.overall.size) state.overall.add(id);
+				refresh();
+			});
+			$('#overlay').addEventListener('click', e => {
+				if (e.target.id === 'overlay') closeDrawer();
+			});
+			$('#drawer').addEventListener('click', e => {
+				const a = e.target.closest('a.player-link[data-f]');
+				if (!a) return;
+				e.preventDefault();
+				openPlayer(a.dataset.f);
+			});
+			document.addEventListener('keydown', e => {
+				if (e.key === 'Escape') closeDrawer();
+			});
+			/* ------------------------------------------------------------------ */
+			/* Init / loader                                                      */
+			/* ------------------------------------------------------------------ */
+			function init(data) {
+				D = data || {};
+				P = D.players || [];
+				$('#loader').classList.add('hidden');
+				$('#page').classList.remove('hidden');
+				const A = D.alliance || {};
+				const name = A.name || A.abbr || 'Alliance';
+				document.title = name + ' · Data Viewer';
+				$('#title').textContent = name;
+				$('#subtitle').textContent = P.length + ' of ' + (A.member_count || P.length) + ' members loaded';
+				$('#brandLogo').textContent = (A.abbr || name || 'A').slice(0, 2).toUpperCase();
+				$('#memberCount').innerHTML = '<b class="text-slate-700">' + P.length + '</b> members';
+				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories.';
+				refresh();
+			}
+
+			function showLoader(err) {
+				$('#loader').classList.remove('hidden');
+				$('#loader').innerHTML = '<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm p-10 text-center">' + '<h3 class="text-lg font-semibold mb-2">Load your alliance data</h3>' + (err ? '<p class="text-xs text-slate-500 mb-2">Reason: <code class="bg-slate-100 px-1.5 py-0.5 rounded">' + esc(err.message || String(err)) + '</code></p>' : '') + '<p class="text-sm text-slate-500 mb-5">Browsers block <code class="bg-slate-100 px-1.5 py-0.5 rounded">fetch()</code> on <code class="bg-slate-100 px-1.5 py-0.5 rounded">file://</code>. Serve this folder over HTTP (e.g. <code class="bg-slate-100 px-1.5 py-0.5 rounded">python -m http.server</code>), or drop <code class="bg-slate-100 px-1.5 py-0.5 rounded">alliance_full.json</code> here.</p>' + '<input type="file" id="pick" accept=".json,application/json" class="block mx-auto text-sm">' + '</div>';
+				const load = f => {
+					const r = new FileReader();
+					r.onload = () => {
+						try {
+							init(JSON.parse(r.result));
+						} catch {
+							alert('That is not a valid alliance_full.json');
+						}
+					};
+					r.readAsText(f);
+				};
+				$('#pick').onchange = e => {
+					if (e.target.files[0]) load(e.target.files[0]);
+				};
+				document.addEventListener('dragover', e => e.preventDefault());
+				document.addEventListener('drop', e => {
+					e.preventDefault();
+					if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+				});
+			}
+			Promise.all([
+				fetch('alliance_full.json').then(r => {
+					if (!r.ok) throw new Error('HTTP ' + r.status);
+					return r.json();
+				}),
+				fetch('names.json').then(r => r.ok ? r.json() : {
+					hero: {}
+				}).catch(() => ({
+					hero: {}
+				}))
+			]).then(([data, names]) => {
+				NAMES = names || {
+					hero: {}
+				};
+				init(data);
+			}).catch(showLoader);
+
+		</script>
+	</body>
+
+</html>
