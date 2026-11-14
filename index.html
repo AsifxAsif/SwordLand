@@ -103,6 +103,14 @@
 				cursor: pointer;
 			}
 
+			.grid-row.is-transfer {
+				background: linear-gradient(90deg, rgba(245,158,11,0.06) 0%, rgba(239,68,68,0.04) 100%);
+			}
+
+			.grid-row.is-transfer:not(.grid-header):hover {
+				background: linear-gradient(90deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
+			}
+
 			.grid-header {
 				background: #f8fafc;
 				font-weight: 600;
@@ -595,6 +603,36 @@
 				border-bottom-color: #3730a3;
 			}
 
+			/* ---------- New Transfer badge ---------- */
+			.transfer-badge {
+				display: inline-block;
+				font-size: 9px;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: .05em;
+				padding: 1.5px 7px;
+				border-radius: 999px;
+				background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+				color: #fff;
+				margin-left: 6px;
+				vertical-align: middle;
+				box-shadow: 0 1px 3px rgba(239, 68, 68, .35);
+				white-space: nowrap;
+				font-family: 'Poppins', system-ui, sans-serif;
+				line-height: 1.25;
+			}
+
+			.transfer-badge .tb-dot {
+				display: inline-block;
+				width: 5px;
+				height: 5px;
+				border-radius: 50%;
+				background: #fff;
+				margin-right: 3px;
+				vertical-align: middle;
+				box-shadow: 0 0 3px rgba(255, 255, 255, .9);
+			}
+
 			/* ---------- Modal ---------- */
 			.modal-overlay {
 				position: fixed;
@@ -658,6 +696,12 @@
 				color: #4338ca;
 			}
 
+			.chip-toggle.transfer-toggle.on {
+				background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.12) 100%);
+				border-color: #f59e0b;
+				color: #b45309;
+			}
+
 			.chip-toggle .dot {
 				width: 13px;
 				height: 13px;
@@ -671,6 +715,11 @@
 			.chip-toggle.on .dot {
 				border-color: #4f46e5;
 				background: #4f46e5;
+			}
+
+			.chip-toggle.transfer-toggle.on .dot {
+				border-color: #f59e0b;
+				background: #f59e0b;
 			}
 
 			.chip-toggle.on .dot::after {
@@ -772,6 +821,9 @@
 						<p class="text-xs text-slate-500">Click any row to open the full dossier</p>
 					</div>
 					<div class="flex-1"></div>
+					<button id="onlyTransfers" class="chip-toggle transfer-toggle" title="Show only players recently transferred into DEW">
+						<span class="dot"></span> New transfers only
+					</button>
 					<div class="relative">
 						<input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
 						<i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -802,7 +854,7 @@
 					hero: {}
 				},
 				P = [];
-			const $ = (s, el = document) => el.querySelector(s);
+			const $ = (s, el = document).querySelector(s);
 			const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
 				'&': '&amp;',
 				'<': '&lt;',
@@ -831,6 +883,72 @@
 			/* ------------------------------------------------------------------ */
 			const heroIcon = id => 'images/kingshot/heroes/hero_headpic_' + id + '.png';
 			const heroName = id => (NAMES.hero && NAMES.hero[String(id)]) || 'Unknown hero';
+			/* ------------------------------------------------------------------ */
+			/* New Transfer detection                                             */
+			/* ------------------------------------------------------------------ */
+			// Names tagged [DEW] / [dew] in GovernorPowerTown CenterFromSeen.txt
+			const TRANSFER_NAMES = [
+				"KaPTan26",
+				"Unknownᴰᴱᵂ",
+				"Nexia",
+				"Lejana不刻意是我溫柔的伏筆",
+				"Lenaᴰᴱᵂ",
+				"Mishaᴰᴱᵂ",
+				"༒ᏋᏕᏟᎪᏁᎾᏒ༒",
+				"༒ᏆᏕᏕᎻᏆᏦᏆ༒",
+				"乂 PRESTİJ༻",
+				"小姍寶",
+				"亗 S A X 亗",
+				"C̸H̸A̸O̸S̸",
+				"MadaRa",
+				"Queen Rosy",
+				"Slavi124",
+				"Yogogoo",
+				"Zed is dead",
+				"KaPTan26&5",
+				"天氣也好",
+				"Heimy",
+				"Lenaa",
+				"Heros",
+				"Smart",
+				"Roxy",
+				"Peaky Bunniders",
+				"IzDIrAp",
+				"Ciel",
+				"Lenaaaaa"
+			];
+
+			function normName(s) {
+				return String(s || '')
+					.normalize('NFKC')
+					.replace(/[\u200B-\u200D\uFEFF]/g, '')
+					.replace(/\s+/g, ' ')
+					.trim()
+					.toLowerCase();
+			}
+
+			function stripTags(s) {
+				return String(s || '')
+					.normalize('NFKC')
+					.replace(/[\u200B-\u200D\uFEFF]/g, '')
+					.replace(/[ᴰᴱᵂᵀᴴᶠ²ᴾ\s·•.&'’]/g, '')
+					.toLowerCase();
+			}
+
+			const TRANSFER_SET = new Set(TRANSFER_NAMES.map(normName));
+			const TRANSFER_SET_STRIPPED = new Set(TRANSFER_NAMES.map(stripTags));
+
+			function isTransferPlayer(p) {
+				if (!p) return false;
+				const n = normName(p.nickname);
+				if (TRANSFER_SET.has(n)) return true;
+				const s = stripTags(p.nickname);
+				return s.length > 2 && TRANSFER_SET_STRIPPED.has(s);
+			}
+
+			function transferBadgeHTML() {
+				return '<span class="transfer-badge" title="Recently transferred into DEW"><span class="tb-dot"></span>New Transfer</span>';
+			}
 			/* ------------------------------------------------------------------ */
 			/* Governor gear helpers                                              */
 			/* ------------------------------------------------------------------ */
@@ -987,7 +1105,8 @@
 				sortKey: 'overall',
 				sortDir: 1,
 				search: '',
-				overall: new Set(CATS.map(c => c.id))
+				overall: new Set(CATS.map(c => c.id)),
+				onlyTransfers: false
 			};
 			let RK = {},
 				OV = {},
@@ -1142,6 +1261,7 @@
 			function tableRows() {
 				const q = state.search;
 				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().includes(q));
+				if (state.onlyTransfers) rows = rows.filter(p => p.isTransfer);
 				const k = state.sortKey;
 				const val = p => {
 					if (k === 'overall') return OV[p.fid];
@@ -1177,13 +1297,14 @@
 						const im = `<img src="${esc(heroIcon(l.id))}" alt="" onerror="this.style.opacity=0.15">`;
 						return `<span class="lead-chip" title="${esc(name)}${l.widgetLevel != null ? ' · Widget level ' + l.widgetLevel : ''}">${im} ${esc(name)}${wl}</span>`;
 					}).join('');
-					h += `<div class="grid-row" data-f="${p.fid}">
+					const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
+					h += `<div class="grid-row ${p.isTransfer?'is-transfer':''}" data-f="${p.fid}">
       <div class="grid-cell rank font-bold text-indigo-700">${OP[p.fid]!=null?'#'+OP[p.fid]:'-'}</div>
       <div class="grid-cell pl">
         <div class="flex items-center gap-3">
           ${avatar(p)}
           <div class="min-w-0" style="overflow:hidden">
-            <div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nickname)}</div>
+            <div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nickname)}${transferBadge}</div>
             ${leads ? '<div class="lead-row">' + leads + '</div>' : ''}
           </div>
         </div>
@@ -1205,6 +1326,7 @@
 				const champKills = P.map(p => (p.championship || {}).killed).filter(x => x != null);
 				const top = [...P].sort((a, b) => b.combatPower - a.combatPower)[0];
 				const oldest = P.filter(p => p.ageDays != null).sort((a, b) => b.ageDays - a.ageDays)[0];
+				const transferCount = P.filter(p => p.isTransfer).length;
 				const card = (label, value, sub, icon, color) => `
     <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition">
       <div class="flex items-start justify-between gap-2">
@@ -1218,7 +1340,7 @@
         </div>
       </div>
     </div>`;
-				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max(...furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Island prosperity', fmtM(islandPros.reduce((a, b) => a + b, 0)), 'avg <b>' + fmtM(Math.round(avg(islandPros))) + '</b>', 'fa-umbrella-beach', 'bg-emerald-100 text-emerald-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
+				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('New transfers', transferCount, transferCount ? '<b>' + transferCount + '</b> recently joined DEW' : 'none matched', 'fa-arrow-right-to-bracket', 'bg-amber-100 text-amber-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max(...furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
 			}
 			/* ------------------------------------------------------------------ */
 			/* Leaders                                                            */
@@ -1250,6 +1372,7 @@
 				return sec('Overview', kvBlock([
 					['Nickname', p.nickname],
 					['Player ID', p.fid || (p.spec && p.spec['Player ID'])],
+					['New transfer', p.isTransfer ? 'Yes — recently joined DEW' : null],
 					['Inactive', p.inactive ? 'Yes' : 'No'],
 					['Combat power', fmtM(p.combatPower)],
 					['Total power', p.power != null ? fmtM(p.power) : null],
@@ -1387,14 +1510,14 @@
 				return sec('Island <span class="hint">prosperity ' + fmtN(i.prosperity) + ' · ' + fmtN(i.likes) + ' likes</span>', b.length ? kvBlock(b) : '<div class="text-slate-400 text-sm">No bonuses.</div>');
 			}
 
-			function normName(s) {
+			function normName2(s) {
 				return String(s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
 			}
 
 			function findPlayerByName(name) {
-				const n = normName(name);
+				const n = normName2(name);
 				if (!n || n === '(this player)') return null;
-				return P.find(p => normName(p.nickname) === n) || null;
+				return P.find(p => normName2(p.nickname) === n) || null;
 			}
 
 			function playerLink(name, extraClass) {
@@ -1407,7 +1530,7 @@
 				const c = p.competition || [];
 				if (!c.length) return '';
 				const rows = c.map(x => {
-					const isSelf = normName(x.name) === normName(p.nickname) || String(x.power || '').includes('this player');
+					const isSelf = normName2(x.name) === normName2(p.nickname) || String(x.power || '').includes('this player');
 					const nameHtml = isSelf ? '<span class="font-semibold text-indigo-700">' + esc(x.name) + '</span>' : playerLink(x.name);
 					return '<div><span>#' + esc(x.rank) + ' ' + nameHtml + '</span><span>' + esc(x.power) + '</span></div>';
 				}).join('');
@@ -1474,7 +1597,7 @@
 			}
 
 			function chipsBlock(p) {
-				return '<div class="flex flex-wrap gap-2 mb-6">' + CATS.map(c => RK[c.id][p.fid] != null ? '<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>' : '').join('') + (OP[p.fid] != null ? '<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>' : '') + '</div>';
+				return '<div class="flex flex-wrap gap-2 mb-6">' + CATS.map(c => RK[c.id][p.fid] != null ? '<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>' : '').join('') + (OP[p.fid] != null ? '<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>' : '') + (p.isTransfer ? transferBadgeHTML() : '') + '</div>';
 			}
 
 			function detailBody(p) {
@@ -1490,7 +1613,8 @@
 					p.kingdom_rank ? ('Kingdom #' + p.kingdom_rank.rank + '/' + p.kingdom_rank.of) : null,
 					p.ageDays != null ? ('data ' + (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old')) : null
 				].filter(Boolean).join(' · ');
-				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(meta) + '</div></div>' + '<button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button>' + '</div>' + '<div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
+				const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
+				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(meta) + '</div></div>' + '<button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button>' + '</div>' + '<div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
 				$('#overlay').classList.add('active');
 				document.body.style.overflow = 'hidden';
 				$('#drawerClose').onclick = closeDrawer;
@@ -1511,12 +1635,12 @@
 			}
 
 			function exportCSV() {
-				const head = ['Overall rank', 'Player', 'Combat power', 'Hero power', 'Furnace level', 'Life tree level', 'Strat score', 'Champ kills', 'Champ lost', 'Island prosperity', 'Island likes', 'Kingdom rank'];
+				const head = ['Overall rank', 'Player', 'New transfer', 'Combat power', 'Hero power', 'Furnace level', 'Life tree level', 'Strat score', 'Champ kills', 'Champ lost', 'Island prosperity', 'Island likes', 'Kingdom rank'];
 				const lines = [head.map(csvCell).join(',')];
 				for (const p of tableRows()) {
 					const c = p.championship || {};
 					const i = p.island || {};
-					lines.push([OP[p.fid], p.nickname, p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore,
+					lines.push([OP[p.fid], p.nickname, p.isTransfer ? 'Yes' : '', p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore,
 						c.killed, c.lost, i.prosperity, i.likes, (p.kingdom_rank || {}).rank
 					].map(csvCell).join(','));
 				}
@@ -1546,6 +1670,11 @@
 			$('#csv').onclick = exportCSV;
 			$('#q').oninput = e => {
 				state.search = e.target.value.trim().toLowerCase();
+				renderTable();
+			};
+			$('#onlyTransfers').onclick = e => {
+				state.onlyTransfers = !state.onlyTransfers;
+				e.currentTarget.classList.toggle('on', state.onlyTransfers);
 				renderTable();
 			};
 			$('#tbl').addEventListener('click', e => {
@@ -1592,6 +1721,8 @@
 			function init(data) {
 				D = data || {};
 				P = D.players || [];
+				// Tag new transfers
+				for (const p of P) p.isTransfer = isTransferPlayer(p);
 				$('#loader').classList.add('hidden');
 				$('#page').classList.remove('hidden');
 				const A = D.alliance || {};
@@ -1601,7 +1732,7 @@
 				$('#subtitle').textContent = P.length + ' of ' + (A.member_count || P.length) + ' members loaded';
 				$('#brandLogo').textContent = (A.abbr || name || 'A').slice(0, 2).toUpperCase();
 				$('#memberCount').innerHTML = '<b class="text-slate-700">' + P.length + '</b> members';
-				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories.';
+				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories. "New Transfer" = governor listed as [DEW] in the power/town-center tracker and matched by nickname.';
 				refresh();
 			}
 
