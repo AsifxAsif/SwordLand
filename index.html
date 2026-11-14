@@ -696,10 +696,10 @@
 				color: #4338ca;
 			}
 
-			.chip-toggle.transfer-toggle.on {
-				background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(239, 68, 68, 0.12) 100%);
-				border-color: #f59e0b;
-				color: #b45309;
+			.chip-toggle.exclude-toggle.on {
+				background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+				border-color: #6366f1;
+				color: #4338ca;
 			}
 
 			.chip-toggle .dot {
@@ -717,9 +717,9 @@
 				background: #4f46e5;
 			}
 
-			.chip-toggle.transfer-toggle.on .dot {
-				border-color: #f59e0b;
-				background: #f59e0b;
+			.chip-toggle.exclude-toggle.on .dot {
+				border-color: #6366f1;
+				background: #6366f1;
 			}
 
 			.chip-toggle.on .dot::after {
@@ -821,8 +821,8 @@
 						<p class="text-xs text-slate-500">Click any row to open the full dossier</p>
 					</div>
 					<div class="flex-1"></div>
-					<button id="onlyTransfers" class="chip-toggle transfer-toggle" title="Show only players recently transferred into DEW">
-						<span class="dot"></span> New transfers only </button>
+					<button id="excludeTransfers" class="chip-toggle exclude-toggle" title="Hide players recently transferred into DEW">
+						<span class="dot"></span> Except new transfers </button>
 					<div class="relative">
 						<input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
 						<i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -901,7 +901,7 @@
 				sortDir: 1,
 				search: '',
 				overall: new Set(),
-				onlyTransfers: false
+				excludeTransfers: false
 			};
 			let RK = {},
 				OV = {},
@@ -1258,7 +1258,7 @@
 			function tableRows() {
 				const q = state.search;
 				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().indexOf(q) !== -1);
-				if (state.onlyTransfers) rows = rows.filter(p => p.isTransfer);
+				if (state.excludeTransfers) rows = rows.filter(p => !p.isTransfer);
 				const k = state.sortKey;
 				const val = p => {
 					if (k === 'overall') return OV[p.fid];
@@ -1679,9 +1679,9 @@
 				state.search = e.target.value.trim().toLowerCase();
 				renderTable();
 			};
-			$('#onlyTransfers').onclick = e => {
-				state.onlyTransfers = !state.onlyTransfers;
-				e.currentTarget.classList.toggle('on', state.onlyTransfers);
+			$('#excludeTransfers').onclick = e => {
+				state.excludeTransfers = !state.excludeTransfers;
+				e.currentTarget.classList.toggle('on', state.excludeTransfers);
 				renderTable();
 			};
 			$('#tbl').addEventListener('click', e => {
@@ -1741,7 +1741,7 @@
 				$('#subtitle').textContent = P.length + ' of ' + (A.member_count || P.length) + ' members loaded';
 				$('#brandLogo').textContent = (A.abbr || name || 'A').slice(0, 2).toUpperCase();
 				$('#memberCount').innerHTML = '<b class="text-slate-700">' + P.length + '</b> members';
-				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories. "New Transfer" = governor listed as [DEW] in the power/town-center tracker and matched by nickname.';
+				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories. "New Transfer" = governor listed as [DEW] in the power/town-center tracker and matched by nickname. The "Except new transfers" toggle hides those players from the table.';
 				refresh();
 			}
 
