@@ -104,11 +104,11 @@
 			}
 
 			.grid-row.is-transfer {
-				background: linear-gradient(90deg, rgba(245,158,11,0.06) 0%, rgba(239,68,68,0.04) 100%);
+				background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, rgba(239, 68, 68, 0.04) 100%);
 			}
 
 			.grid-row.is-transfer:not(.grid-header):hover {
-				background: linear-gradient(90deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.08) 100%);
+				background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%);
 			}
 
 			.grid-header {
@@ -697,7 +697,7 @@
 			}
 
 			.chip-toggle.transfer-toggle.on {
-				background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(239,68,68,0.12) 100%);
+				background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(239, 68, 68, 0.12) 100%);
 				border-color: #f59e0b;
 				color: #b45309;
 			}
@@ -822,8 +822,7 @@
 					</div>
 					<div class="flex-1"></div>
 					<button id="onlyTransfers" class="chip-toggle transfer-toggle" title="Show only players recently transferred into DEW">
-						<span class="dot"></span> New transfers only
-					</button>
+						<span class="dot"></span> New transfers only </button>
 					<div class="relative">
 						<input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
 						<i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -847,103 +846,87 @@
 		</div>
 		<script>
 			/* ------------------------------------------------------------------ */
-			/* State                                                               */
+			/* Safe helpers (no shadowed identifiers)                              */
 			/* ------------------------------------------------------------------ */
-			let D = {},
-				NAMES = {
-					hero: {}
-				},
-				P = [];
-			const $ = (s, el = document).querySelector(s);
-			const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
-				'&': '&amp;',
-				'<': '&lt;',
-				'>': '&gt;',
-				'"': '&quot;',
-				"'": '&#39;'
-			} [c] || c));
-			const dd = p => p.derived || {};
+			const $ = (sel, root) => (root || document).querySelector(sel);
+
+			function esc(val) {
+				if (val == null) return '';
+				return String(val).replace(/[&<>"']/g, function(ch) {
+					switch (ch) {
+						case '&':
+							return '&amp;';
+						case '<':
+							return '&lt;';
+						case '>':
+							return '&gt;';
+						case '"':
+							return '&quot;';
+						case "'":
+							return '&#39;';
+						default:
+							return ch;
+					}
+				});
+			}
+			const dd = p => (p && p.derived) || {};
 			const fmtM = n => n == null ? '-' : n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
 			const fmtN = n => n == null ? '-' : Number(n).toLocaleString('en-US');
-			const pct = n => n == null || isNaN(n) ? '-' : (n > 0 ? '+' : '') + Number(n).toFixed(1) + '%';
+			const pct = n => (n == null || isNaN(n)) ? '-' : (n > 0 ? '+' : '') + Number(n).toFixed(1) + '%';
 			const img = (src, cls) => src ? '<img src="' + esc(src) + '" class="' + (cls || '') + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
-			const timeAgo = s => {
-				if (!s) return '-';
+
+			function timeAgo(str) {
+				if (!str) return '-';
 				try {
-					const d = new Date(s);
+					const d = new Date(str);
 					const days = Math.floor((Date.now() - d.getTime()) / 86400000);
 					if (days <= 0) return 'today';
 					return days + 'd ago';
-				} catch {
-					return s;
+				} catch (e) {
+					return str;
 				}
-			};
-			/* ------------------------------------------------------------------ */
-			/* Hero helpers                                                       */
-			/* ------------------------------------------------------------------ */
+			}
 			const heroIcon = id => 'images/kingshot/heroes/hero_headpic_' + id + '.png';
-			const heroName = id => (NAMES.hero && NAMES.hero[String(id)]) || 'Unknown hero';
+			const heroName = id => (NAMES && NAMES.hero && NAMES.hero[String(id)]) || 'Unknown hero';
+			/* ------------------------------------------------------------------ */
+			/* State                                                              */
+			/* ------------------------------------------------------------------ */
+			let D = {};
+			let NAMES = {
+				hero: {}
+			};
+			let P = [];
+			const state = {
+				sortKey: 'overall',
+				sortDir: 1,
+				search: '',
+				overall: new Set(),
+				onlyTransfers: false
+			};
+			let RK = {},
+				OV = {},
+				OP = {};
 			/* ------------------------------------------------------------------ */
 			/* New Transfer detection                                             */
 			/* ------------------------------------------------------------------ */
-			// Names tagged [DEW] / [dew] in GovernorPowerTown CenterFromSeen.txt
-			const TRANSFER_NAMES = [
-				"KaPTan26",
-				"Unknownᴰᴱᵂ",
-				"Nexia",
-				"Lejana不刻意是我溫柔的伏筆",
-				"Lenaᴰᴱᵂ",
-				"Mishaᴰᴱᵂ",
-				"༒ᏋᏕᏟᎪᏁᎾᏒ༒",
-				"༒ᏆᏕᏕᎻᏆᏦᏆ༒",
-				"乂 PRESTİJ༻",
-				"小姍寶",
-				"亗 S A X 亗",
-				"C̸H̸A̸O̸S̸",
-				"MadaRa",
-				"Queen Rosy",
-				"Slavi124",
-				"Yogogoo",
-				"Zed is dead",
-				"KaPTan26&5",
-				"天氣也好",
-				"Heimy",
-				"Lenaa",
-				"Heros",
-				"Smart",
-				"Roxy",
-				"Peaky Bunniders",
-				"IzDIrAp",
-				"Ciel",
-				"Lenaaaaa"
-			];
+			const TRANSFER_NAMES = ["KaPTan26", "Unknownᴰᴱᵂ", "Nexia", "Lejana不刻意是我溫柔的伏筆", "Lenaᴰᴱᵂ", "Mishaᴰᴱᵂ", "༒ᏋᏕᏟᎪᏁᎾᏒ༒", "༒ᏆᏕᏕᎻᏆᏦᏆ༒", "乂 PRESTİJ༻", "小姍寶", "亗 S A X 亗", "C̸H̸A̸O̸S̸", "MadaRa", "Queen Rosy", "Slavi124", "Yogogoo", "Zed is dead", "KaPTan26&5", "天氣也好", "Heimy", "Lenaa", "Heros", "Smart", "Roxy", "Peaky Bunniders", "IzDIrAp", "Ciel", "Lenaaaaa"];
 
-			function normName(s) {
-				return String(s || '')
-					.normalize('NFKC')
-					.replace(/[\u200B-\u200D\uFEFF]/g, '')
-					.replace(/\s+/g, ' ')
-					.trim()
-					.toLowerCase();
+			function normName(str) {
+				return String(str || '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
 			}
 
-			function stripTags(s) {
-				return String(s || '')
-					.normalize('NFKC')
-					.replace(/[\u200B-\u200D\uFEFF]/g, '')
-					.replace(/[ᴰᴱᵂᵀᴴᶠ²ᴾ\s·•.&'’]/g, '')
-					.toLowerCase();
+			function stripTags(str) {
+				return String(str || '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[ᴰᴱᵂᵀᴴᶠ²ᴾ\s·•.&'’]/g, '').toLowerCase();
 			}
-
 			const TRANSFER_SET = new Set(TRANSFER_NAMES.map(normName));
 			const TRANSFER_SET_STRIPPED = new Set(TRANSFER_NAMES.map(stripTags));
 
-			function isTransferPlayer(p) {
-				if (!p) return false;
-				const n = normName(p.nickname);
+			function isTransferPlayer(player) {
+				if (!player || !player.nickname) return false;
+				const n = normName(player.nickname);
 				if (TRANSFER_SET.has(n)) return true;
-				const s = stripTags(p.nickname);
-				return s.length > 2 && TRANSFER_SET_STRIPPED.has(s);
+				const st = stripTags(player.nickname);
+				return st.length > 2 && TRANSFER_SET_STRIPPED.has(st);
 			}
 
 			function transferBadgeHTML() {
@@ -983,8 +966,9 @@
 					stars: 0
 				};
 				let b = GOV_BLOCKS[0];
-				for (const x of GOV_BLOCKS)
-					if (c >= x[0]) b = x;
+				for (let i = 0; i < GOV_BLOCKS.length; i++) {
+					if (c >= GOV_BLOCKS[i][0]) b = GOV_BLOCKS[i];
+				}
 				return {
 					quality: b[1],
 					tier: b[2],
@@ -996,8 +980,8 @@
 				return d ? d.quality + (d.tier ? ' T' + d.tier : '') + (d.stars ? ' · ' + d.stars + '★' : '') : '-';
 			}
 
-			function govProgress(p) {
-				const cs = (p.governor_gear || []).map(govCode).filter(c => c != null);
+			function govProgress(player) {
+				const cs = (player.governor_gear || []).map(govCode).filter(c => c != null);
 				return cs.length ? cs.reduce((a, b) => a + b, 0) : null;
 			}
 			const Q_SUFFIX_TO_QUALITY = {
@@ -1010,17 +994,15 @@
 			};
 			const ICON_RE = /lordsequipment_icon_\d+(\d)\.png$/;
 
-			function qualityFromIcon(p) {
-				if (!p) return null;
-				const m = ICON_RE.exec(String(p).replace(/\\/g, '/'));
+			function qualityFromIcon(path) {
+				if (!path) return null;
+				const m = ICON_RE.exec(String(path).replace(/\\/g, '/'));
 				return m ? (Q_SUFFIX_TO_QUALITY[m[1]] || null) : null;
 			}
 
 			function govQuality(g) {
 				const raw = (g.quality || '').toLowerCase().trim();
-				if (raw === 'legendary' || raw === 'mythic' || raw === 'epic' || raw === 'rare' || raw === 'uncommon') {
-					return raw;
-				}
+				if (raw === 'legendary' || raw === 'mythic' || raw === 'epic' || raw === 'rare' || raw === 'uncommon') return raw;
 				const qIcon = qualityFromIcon(g.icon);
 				if (qIcon) return qIcon;
 				const dq = govDecode(govCode(g));
@@ -1051,8 +1033,8 @@
 				if (!eid) return g.icon || null;
 				const piece = Math.floor(eid / 1000);
 				const q = govQuality(g);
-				const _d = govDecode(govCode(g));
-				const tier = _d ? (_d.tier || 1) : (Number(g.tier) || 1);
+				const dec = govDecode(govCode(g));
+				const tier = dec ? (dec.tier || 1) : (Number(g.tier) || 1);
 				let digit = null;
 				if (q === 'legendary') digit = 5;
 				else if (q === 'mythic') digit = tier >= 2 ? 7 : 4;
@@ -1099,18 +1081,10 @@
 				cell: 'charm',
 				icon: 'fa-diamond'
 			}];
-			const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+			const CAT = {};
+			for (let i = 0; i < CATS.length; i++) CAT[CATS[i].id] = CATS[i];
 			const TROOPS = ['infantry', 'cavalry', 'archers'];
-			const state = {
-				sortKey: 'overall',
-				sortDir: 1,
-				search: '',
-				overall: new Set(CATS.map(c => c.id)),
-				onlyTransfers: false
-			};
-			let RK = {},
-				OV = {},
-				OP = {};
+			for (let i = 0; i < CATS.length; i++) state.overall.add(CATS[i].id);
 
 			function ranksFrom(pairs) {
 				const o = {};
@@ -1118,7 +1092,9 @@
 					prev = null,
 					i = 0;
 				pairs.sort((a, b) => b[1] - a[1]);
-				for (const [k, v] of pairs) {
+				for (let j = 0; j < pairs.length; j++) {
+					const k = pairs[j][0],
+						v = pairs[j][1];
 					i++;
 					if (v !== prev) {
 						r = i;
@@ -1131,10 +1107,15 @@
 
 			function compute() {
 				RK = {};
-				for (const c of CATS) RK[c.id] = ranksFrom(P.map(p => [p.fid, c.get(p)]).filter(x => x[1] != null && !isNaN(x[1])));
+				for (let i = 0; i < CATS.length; i++) {
+					const c = CATS[i];
+					RK[c.id] = ranksFrom(P.map(p => [p.fid, c.get(p)]).filter(x => x[1] != null && !isNaN(x[1])));
+				}
 				OV = {};
-				for (const p of P) {
-					const rs = [...state.overall].map(id => RK[id][p.fid]).filter(x => x != null);
+				const ticked = Array.from(state.overall);
+				for (let i = 0; i < P.length; i++) {
+					const p = P[i];
+					const rs = ticked.map(id => RK[id] && RK[id][p.fid]).filter(x => x != null);
 					OV[p.fid] = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
 				}
 				const ord = P.map(p => [p.fid, OV[p.fid]]).filter(x => x[1] != null).sort((a, b) => a[1] - b[1]);
@@ -1142,7 +1123,9 @@
 				let r = 0,
 					prev = null,
 					i = 0;
-				for (const [k, v] of ord) {
+				for (let j = 0; j < ord.length; j++) {
+					const k = ord[j][0],
+						v = ord[j][1];
 					i++;
 					if (v !== prev) {
 						r = i;
@@ -1151,7 +1134,12 @@
 					OP[k] = r;
 				}
 			}
-			const byFid = fid => P.find(p => p.fid === fid);
+
+			function byFid(fid) {
+				for (let i = 0; i < P.length; i++)
+					if (P[i].fid === fid) return P[i];
+				return null;
+			}
 			/* ------------------------------------------------------------------ */
 			/* Rendering helpers                                                  */
 			/* ------------------------------------------------------------------ */
@@ -1167,12 +1155,17 @@
 
 			function troopCell(p) {
 				const t = p.troops || {};
-				const parts = TROOPS.filter(k => t[k]).map(k => '<span class="troop-pill" title="' + k + ' · ' + t[k].label + '">' + img(t[k].icon, '') + '<span class="tt">T' + t[k].tier + '</span>' + (t[k].tg != null ? '<span class="tg">TG' + t[k].tg + '</span>' : '') + '</span>');
+				const parts = [];
+				for (let i = 0; i < TROOPS.length; i++) {
+					const k = TROOPS[i];
+					if (!t[k]) continue;
+					parts.push('<span class="troop-pill" title="' + esc(k) + ' · ' + esc(t[k].label) + '">' + img(t[k].icon, '') + '<span class="tt">T' + t[k].tier + '</span>' + (t[k].tg != null ? '<span class="tg">TG' + t[k].tg + '</span>' : '') + '</span>');
+				}
 				return parts.length ? '<div class="troop-cell">' + parts.join('') + '</div>' : '<span class="text-slate-400">-</span>';
 			}
 
-			function govLabel(p) {
-				const gears = p.governor_gear || [];
+			function govLabel(player) {
+				const gears = player.governor_gear || [];
 				if (!gears.length) return '-';
 				const Q_ORDER = {
 					uncommon: 0,
@@ -1182,7 +1175,8 @@
 					legendary: 4
 				};
 				let best = null;
-				for (const g of gears) {
+				for (let i = 0; i < gears.length; i++) {
+					const g = gears[i];
 					const q = (g.quality || '').toLowerCase().trim();
 					if (!q && !g.label) continue;
 					const tier = Number(g.tier) || 0;
@@ -1190,7 +1184,7 @@
 					const score = (Q_ORDER[q] != null ? Q_ORDER[q] : -1) * 100 + tier * 10 + stars;
 					if (!best || score > best.score) {
 						best = {
-							score,
+							score: score,
 							label: g.label || (q ? (q.charAt(0).toUpperCase() + q.slice(1) + (tier ? ' T' + tier : '') + (stars ? ' · ' + stars + '★' : '')) : null)
 						};
 					}
@@ -1200,17 +1194,22 @@
 				if (!cs.length) return '-';
 				return govLabelOf(govDecode(Math.round(cs.reduce((a, b) => a + b, 0) / cs.length)));
 			}
-			/* 6 governor-gear tiles in a single row — colored frame + star row + tier */
+
 			function govGearImages(p) {
 				const gears = p.governor_gear || [];
 				if (!gears.length) return '<span class="text-slate-400">-</span>';
-				const tiles = gears.map(g => {
+				const tiles = [];
+				for (let i = 0; i < gears.length; i++) {
+					const g = gears[i];
 					const iconPath = govIconPath(g);
-					if (!iconPath) return '<div class="gear-tile"><span class="text-slate-400 text-[10px]">-</span></div>';
+					if (!iconPath) {
+						tiles.push('<div class="gear-tile"><span class="text-slate-400 text-[10px]">-</span></div>');
+						continue;
+					}
 					const qc = govQualityClass(g);
 					const dec = govDecode(govCode(g));
-					let stars = 0;
-					let tier = 0;
+					let stars = 0,
+						tier = 0;
 					if (dec) {
 						stars = dec.stars || 0;
 						tier = dec.tier || 0;
@@ -1221,11 +1220,11 @@
 					const starRow = '<span class="stars">' + (stars > 0 ? '★'.repeat(stars) : '\u00a0') + '</span>';
 					const tierRow = '<span class="tier">' + (tier > 0 ? 'T' + tier : '\u00a0') + '</span>';
 					const tip = (g.name || '') + ' · ' + (g.label || govQuality(g));
-					return '<div class="gear-tile" title="' + esc(tip) + '">' + '<div class="gear-frame ' + qc + '"><img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15"></div>' + starRow + tierRow + '</div>';
-				}).join('');
-				return '<div class="gear-icon-grid">' + tiles + '</div>';
+					tiles.push('<div class="gear-tile" title="' + esc(tip) + '"><div class="gear-frame ' + qc + '"><img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15"></div>' + starRow + tierRow + '</div>');
+				}
+				return '<div class="gear-icon-grid">' + tiles.join('') + '</div>';
 			}
-			/* 18 charm icons as 2 rows × 3 columns, each with its level under it */
+
 			function govCharmImages(p) {
 				const gears = p.governor_gear || [];
 				if (!gears.length) return '<span class="text-slate-400">-</span>';
@@ -1233,8 +1232,12 @@
 				for (let i = 0; i < 6; i++) {
 					const g = gears[i];
 					const charms = (g && g.charms) || [];
-					const groups = charms.map(c => '<span class="charm-item" title="Lv' + c.level_guess + ' · raw ' + c.raw + '">' + '<img src="' + esc(c.icon) + '" alt="" onerror="this.style.opacity=.15">' + '<span class="lv">' + c.level_guess + '</span>' + '</span>').join('');
-					html += '<div class="charm-group">' + (groups || '<span class="text-slate-300 text-[10px]">-</span>') + '</div>';
+					const groups = [];
+					for (let j = 0; j < charms.length; j++) {
+						const c = charms[j];
+						groups.push('<span class="charm-item" title="Lv' + c.level_guess + ' · raw ' + c.raw + '"><img src="' + esc(c.icon) + '" alt="" onerror="this.style.opacity=.15"><span class="lv">' + c.level_guess + '</span></span>');
+					}
+					html += '<div class="charm-group">' + (groups.length ? groups.join('') : '<span class="text-slate-300 text-[10px]">-</span>') + '</div>';
 				}
 				html += '</div>';
 				return html;
@@ -1244,15 +1247,9 @@
 				const v = c.get(p);
 				if (v == null) return '<span class="text-slate-400">-</span>';
 				const rk = rankChip(RK[c.id][p.fid]);
-				if (c.cell === 'troops') {
-					return '<div class="cell-main">' + troopCell(p) + rk + '</div>';
-				}
-				if (c.cell === 'gov') {
-					return '<div class="cell-main">' + govGearImages(p) + rk + '</div>';
-				}
-				if (c.cell === 'charm') {
-					return '<div class="cell-main">' + govCharmImages(p) + rk + '</div>';
-				}
+				if (c.cell === 'troops') return '<div class="cell-main">' + troopCell(p) + rk + '</div>';
+				if (c.cell === 'gov') return '<div class="cell-main">' + govGearImages(p) + rk + '</div>';
+				if (c.cell === 'charm') return '<div class="cell-main">' + govCharmImages(p) + rk + '</div>';
 				return '<div class="cell-main"><span class="cell-val">' + c.fmt(v) + '</span>' + rk + '</div>';
 			}
 			/* ------------------------------------------------------------------ */
@@ -1260,7 +1257,7 @@
 			/* ------------------------------------------------------------------ */
 			function tableRows() {
 				const q = state.search;
-				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().includes(q));
+				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().indexOf(q) !== -1);
 				if (state.onlyTransfers) rows = rows.filter(p => p.isTransfer);
 				const k = state.sortKey;
 				const val = p => {
@@ -1281,7 +1278,7 @@
 
 			function renderTable() {
 				const rows = tableRows();
-				const th = (key, label, cls) => `<div class="grid-cell grid-header ${cls||''} ${state.sortKey===key?'text-indigo-600':''}" data-k="${key}">${label} ${state.sortKey===key?(state.sortDir>0?'▲':'▼'):''}</div>`;
+				const th = (key, label, cls) => '<div class="grid-cell grid-header ' + (cls || '') + ' ' + (state.sortKey === key ? 'text-indigo-600' : '') + '" data-k="' + key + '">' + label + ' ' + (state.sortKey === key ? (state.sortDir > 0 ? '▲' : '▼') : '') + '</div>';
 				const shortLabels = {
 					combat: 'Combat',
 					heroPower: 'Hero pwr',
@@ -1289,33 +1286,25 @@
 					gov: 'Gov gear',
 					charm: 'Charms'
 				};
-				let h = `<div class="grid-row grid-header">` + th('overall', 'Rank', 'rank') + th('name', 'Player', 'pl') + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join('') + `</div>`;
-				for (const p of rows) {
-					const leads = (p.lead || []).map(l => {
-						const name = heroName(l.id);
+				let h = '<div class="grid-row grid-header">' + th('overall', 'Rank', 'rank') + th('name', 'Player', 'pl') + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join('') + '</div>';
+				for (let i = 0; i < rows.length; i++) {
+					const p = rows[i];
+					const leadParts = [];
+					const lead = p.lead || [];
+					for (let j = 0; j < lead.length; j++) {
+						const l = lead[j];
+						const nm = heroName(l.id);
 						const wl = l.widgetLevel != null ? ' · W' + l.widgetLevel : '';
-						const im = `<img src="${esc(heroIcon(l.id))}" alt="" onerror="this.style.opacity=0.15">`;
-						return `<span class="lead-chip" title="${esc(name)}${l.widgetLevel != null ? ' · Widget level ' + l.widgetLevel : ''}">${im} ${esc(name)}${wl}</span>`;
-					}).join('');
+						leadParts.push('<span class="lead-chip" title="' + esc(nm) + (l.widgetLevel != null ? ' · Widget level ' + l.widgetLevel : '') + '"><img src="' + esc(heroIcon(l.id)) + '" alt="" onerror="this.style.opacity=0.15"> ' + esc(nm) + wl + '</span>');
+					}
+					const leads = leadParts.join('');
 					const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
-					h += `<div class="grid-row ${p.isTransfer?'is-transfer':''}" data-f="${p.fid}">
-      <div class="grid-cell rank font-bold text-indigo-700">${OP[p.fid]!=null?'#'+OP[p.fid]:'-'}</div>
-      <div class="grid-cell pl">
-        <div class="flex items-center gap-3">
-          ${avatar(p)}
-          <div class="min-w-0" style="overflow:hidden">
-            <div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.nickname)}${transferBadge}</div>
-            ${leads ? '<div class="lead-row">' + leads + '</div>' : ''}
-          </div>
-        </div>
-      </div>
-      ${CATS.map(c=>`<div class="grid-cell" title="${esc(c.label)}">${cellHTML(c,p)}</div>`).join('')}
-    </div>`;
+					h += '<div class="grid-row ' + (p.isTransfer ? 'is-transfer' : '') + '" data-f="' + p.fid + '">' + '<div class="grid-cell rank font-bold text-indigo-700">' + (OP[p.fid] != null ? '#' + OP[p.fid] : '-') + '</div>' + '<div class="grid-cell pl"><div class="flex items-center gap-3">' + avatar(p) + '<div class="min-w-0" style="overflow:hidden"><div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.nickname) + transferBadge + '</div>' + (leads ? '<div class="lead-row">' + leads + '</div>' : '') + '</div></div></div>' + CATS.map(c => '<div class="grid-cell" title="' + esc(c.label) + '">' + cellHTML(c, p) + '</div>').join('') + '</div>';
 				}
 				$('#tbl').innerHTML = h;
 			}
 			/* ------------------------------------------------------------------ */
-			/* Stat cards                                                          */
+			/* Stat cards                                                         */
 			/* ------------------------------------------------------------------ */
 			function renderStats() {
 				const total = P.length;
@@ -1324,37 +1313,35 @@
 				const furnaces = P.map(p => p.furnaceLevel).filter(x => x != null);
 				const islandPros = P.map(p => (p.island || {}).prosperity).filter(x => x != null);
 				const champKills = P.map(p => (p.championship || {}).killed).filter(x => x != null);
-				const top = [...P].sort((a, b) => b.combatPower - a.combatPower)[0];
+				const top = P.slice().sort((a, b) => b.combatPower - a.combatPower)[0];
 				const oldest = P.filter(p => p.ageDays != null).sort((a, b) => b.ageDays - a.ageDays)[0];
 				const transferCount = P.filter(p => p.isTransfer).length;
-				const card = (label, value, sub, icon, color) => `
-    <div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition">
-      <div class="flex items-start justify-between gap-2">
-        <div class="min-w-0">
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">${label}</div>
-          <div class="text-2xl font-bold mt-1 tabular-nums">${value}</div>
-          <div class="text-[11.5px] text-slate-500 mt-1 truncate">${sub}</div>
-        </div>
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none ${color}">
-          <i class="fas ${icon} text-xl"></i>
-        </div>
-      </div>
-    </div>`;
-				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('New transfers', transferCount, transferCount ? '<b>' + transferCount + '</b> recently joined DEW' : 'none matched', 'fa-arrow-right-to-bracket', 'bg-amber-100 text-amber-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max(...furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
+				const card = (label, value, sub, icon, color) => '<div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">' + label + '</div><div class="text-2xl font-bold mt-1 tabular-nums">' + value + '</div><div class="text-[11.5px] text-slate-500 mt-1 truncate">' + sub + '</div></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none ' + color + '"><i class="fas ' + icon + ' text-xl"></i></div></div></div>';
+				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('New transfers', transferCount, transferCount ? '<b>' + transferCount + '</b> recently joined DEW' : 'none matched', 'fa-arrow-right-to-bracket', 'bg-amber-100 text-amber-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max.apply(null, furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
 			}
 			/* ------------------------------------------------------------------ */
 			/* Leaders                                                            */
 			/* ------------------------------------------------------------------ */
 			function renderLeaders() {
-				$('#leaders').innerHTML = CATS.map(c => {
+				const blocks = [];
+				for (let i = 0; i < CATS.length; i++) {
+					const c = CATS[i];
 					const top = P.map(p => [p, c.get(p)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 3);
 					const disp = p => c.id === 'troops' ? TROOPS.map(k => p.troops && p.troops[k] ? 'T' + p.troops[k].tier : '-').join('/') : c.id === 'gov' ? govLabel(p) : c.fmt(c.get(p));
-					return '<div class="bg-slate-50 rounded-xl p-4 border border-slate-100">' + '<h3 class="text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3 flex items-center gap-2"><i class="fas ' + c.icon + ' text-indigo-500"></i>' + esc(c.label) + '</h3>' + top.map(([p]) => '<div class="flex justify-between items-center py-1.5 text-[13px] cursor-pointer hover:text-indigo-600 border-b border-slate-100 last:border-0" data-f="' + p.fid + '"><span class="truncate font-medium">' + esc(p.nickname) + '</span><span class="text-slate-500 tabular-nums ml-2">' + disp(p) + '</span></div>').join('') + '</div>';
-				}).join('');
+					const rows = top.map(x => '<div class="flex justify-between items-center py-1.5 text-[13px] cursor-pointer hover:text-indigo-600 border-b border-slate-100 last:border-0" data-f="' + x[0].fid + '"><span class="truncate font-medium">' + esc(x[0].nickname) + '</span><span class="text-slate-500 tabular-nums ml-2">' + disp(x[0]) + '</span></div>').join('');
+					blocks.push('<div class="bg-slate-50 rounded-xl p-4 border border-slate-100"><h3 class="text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3 flex items-center gap-2"><i class="fas ' + c.icon + ' text-indigo-500"></i>' + esc(c.label) + '</h3>' + rows + '</div>');
+				}
+				$('#leaders').innerHTML = blocks.join('');
 			}
 
 			function renderCatToggles() {
-				$('#overallcats').innerHTML = CATS.map(c => '<label class="chip-toggle ' + (state.overall.has(c.id) ? 'on' : '') + '"><input type="checkbox" data-c="' + c.id + '" class="hidden" ' + (state.overall.has(c.id) ? 'checked' : '') + '><span class="dot"></span>' + esc(c.label) + '</label>').join('');
+				const out = [];
+				for (let i = 0; i < CATS.length; i++) {
+					const c = CATS[i];
+					const on = state.overall.has(c.id);
+					out.push('<label class="chip-toggle ' + (on ? 'on' : '') + '"><input type="checkbox" data-c="' + c.id + '" class="hidden" ' + (on ? 'checked' : '') + '><span class="dot"></span>' + esc(c.label) + '</label>');
+				}
+				$('#overallcats').innerHTML = out.join('');
 			}
 			/* ------------------------------------------------------------------ */
 			/* Detail drawer sections                                             */
@@ -1364,8 +1351,13 @@
 			}
 
 			function kvBlock(entries) {
-				const rows = entries.filter(e => e && e[1] != null && e[1] !== '').map(([k, v]) => '<div><span>' + esc(k) + '</span><span>' + esc(v) + '</span></div>').join('');
-				return rows ? '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>' : '';
+				const rows = [];
+				for (let i = 0; i < entries.length; i++) {
+					const e = entries[i];
+					if (!e || e[1] == null || e[1] === '') continue;
+					rows.push('<div><span>' + esc(e[0]) + '</span><span>' + esc(e[1]) + '</span></div>');
+				}
+				return rows.length ? '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows.join('') + '</div>' : '';
 			}
 
 			function coreBlock(p) {
@@ -1401,21 +1393,20 @@
 			function leadBlock(p) {
 				const lead = p.lead || [];
 				if (!lead.length) return '';
-				const chips = lead.map(l => {
-					const im = '<img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15">';
-					return '<span class="chip">' + im + '<b>' + esc(heroName(l.id)) + '</b>' + (l.widgetLevel != null ? ' · widget <b>' + l.widgetLevel + '</b>' : '') + '</span>';
-				}).join('');
+				const chips = lead.map(l => '<span class="chip"><img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15"><b>' + esc(heroName(l.id)) + '</b>' + (l.widgetLevel != null ? ' · widget <b>' + l.widgetLevel + '</b>' : '') + '</span>').join('');
 				return sec('Lead heroes', '<div class="flex flex-wrap gap-2.5">' + chips + '</div>');
 			}
 
 			function troopsBlock(p) {
 				const t = p.troops || {};
 				if (!Object.keys(t).length) return sec('Troops', '<div class="text-slate-400 text-sm">No troop data.</div>');
-				const cards = TROOPS.filter(k => t[k]).map(k => {
-					const tk = t[k];
-					return '<div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">' + img(tk.icon, 'w-14 h-14 rounded-lg') + '<div><div class="text-sm font-semibold capitalize">' + esc(k) + '</div><div class="text-[11.5px] text-slate-500">Tier ' + tk.tier + ' · TG ' + tk.tg + '</div></div>' + '</div>';
-				}).join('');
-				return sec('Troops (top tier per type)', '<div class="flex flex-wrap gap-3">' + cards + '</div>');
+				const cards = [];
+				for (let i = 0; i < TROOPS.length; i++) {
+					const k = TROOPS[i];
+					if (!t[k]) continue;
+					cards.push('<div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">' + img(t[k].icon, 'w-14 h-14 rounded-lg') + '<div><div class="text-sm font-semibold capitalize">' + esc(k) + '</div><div class="text-[11.5px] text-slate-500">Tier ' + t[k].tier + ' · TG ' + t[k].tg + '</div></div></div>');
+				}
+				return sec('Troops (top tier per type)', '<div class="flex flex-wrap gap-3">' + cards.join('') + '</div>');
 			}
 
 			function heroGearClass(g) {
@@ -1432,11 +1423,11 @@
 				const gear = (h.gear || []).map(g => {
 					const tip = (g.name || 'Gear') + ' · Forge ' + g.refine + ' · Lv' + g.enhance_level + (g.enhance_plus ? ' +' + g.enhance_plus : '') + (g.exp != null ? ' · XP ' + g.exp : '');
 					const forge = (g.refine != null && g.refine > 0) ? '<span class="forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">' + g.refine + '</span>' : '';
-					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + (g.enhance_level ?? 0) + (g.enhance_plus ? '<b class="text-emerald-600">+' + g.enhance_plus + '</b>' : '') + '</span>' + (g.name ? '<span class="block text-[9px] text-slate-400 truncate mt-0.5" style="max-width:64px;margin:0 auto">' + esc(g.name) + '</span>' : '') + '</div>';
+					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + (g.enhance_level != null ? g.enhance_level : 0) + (g.enhance_plus ? '<b class="text-emerald-600">+' + g.enhance_plus + '</b>' : '') + '</span>' + (g.name ? '<span class="block text-[9px] text-slate-400 truncate mt-0.5" style="max-width:64px;margin:0 auto">' + esc(g.name) + '</span>' : '') + '</div>';
 				}).join('');
 				const ex = h.exclusive ? ' · Exclusive Lv' + h.exclusive.level : '';
-				const skills = (h.skills || []).map(s => esc(s.name || ('Skill ' + s.id)) + ' Lv' + (s.level ?? 0)).join(' · ');
-				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col">' + '<div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(heroName(h.hero_id) || h.name || ('Hero ' + h.hero_id)) + '</div>' + '<div class="text-[12px] text-slate-500">' + (h.star ?? 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div></div>' + '<div class="text-[11px] text-slate-500 mb-2 truncate" title="' + skills + '" style="min-height:16px">' + (skills || '') + '</div>' + '<div class="grid grid-cols-4 gap-2 mt-auto">' + gear + '</div></div>';
+				const skills = (h.skills || []).map(sk => esc(sk.name || ('Skill ' + sk.id)) + ' Lv' + (sk.level != null ? sk.level : 0)).join(' · ');
+				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col"><div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(heroName(h.hero_id) || h.name || ('Hero ' + h.hero_id)) + '</div><div class="text-[12px] text-slate-500">' + (h.star != null ? h.star : 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div></div><div class="text-[11px] text-slate-500 mb-2 truncate" title="' + esc(skills) + '" style="min-height:16px">' + esc(skills) + '</div><div class="grid grid-cols-4 gap-2 mt-auto">' + gear + '</div></div>';
 			}
 
 			function heroesBlock(p) {
@@ -1449,11 +1440,11 @@
 				const qc = govQualityClass(g);
 				const iconPath = govIconPath(g);
 				const imgs = iconPath ? '<img src="' + esc(iconPath) + '" class="gi2" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
-				const _dv = govDecode(govCode(g));
-				const nstars = _dv ? _dv.stars : (g.stars || 0);
+				const dec = govDecode(govCode(g));
+				const nstars = dec ? dec.stars : (g.stars || 0);
 				const stars = nstars ? '<span class="st">' + '★'.repeat(nstars) + '</span>' : '';
-				const label = g.label || (_dv ? govLabelOf(_dv) : (g.quality || ''));
-				return '<div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5">' + '<div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div>' + '<div class="flex-1 min-w-0">' + '<div class="text-[15px] font-semibold truncate">' + esc(g.name || 'Gear piece') + '</div>' + '<div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + '</div>' + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5">ID ' + g.equip_id + (g.progress != null ? ' · progress ' + g.progress : '') + '</div>' : '') + '</div>' + '<div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + '</div></div>';
+				const label = g.label || (dec ? govLabelOf(dec) : (g.quality || ''));
+				return '<div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5"><div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div><div class="flex-1 min-w-0"><div class="text-[15px] font-semibold truncate">' + esc(g.name || 'Gear piece') + '</div><div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + '</div>' + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5">ID ' + g.equip_id + (g.progress != null ? ' · progress ' + g.progress : '') + '</div>' : '') + '</div><div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + '</div></div>';
 			}
 
 			function govBlock(p) {
@@ -1469,12 +1460,12 @@
 
 			function powerBlock(p) {
 				const pb = p.power_breakdown || {};
-				return Object.keys(pb).length ? sec('Power breakdown' + (p.power_summary ? ' <span class="hint">' + esc(p.power_summary) + '</span>' : ''), kvBlock(Object.entries(pb))) : '';
+				return Object.keys(pb).length ? sec('Power breakdown' + (p.power_summary ? ' <span class="hint">' + esc(p.power_summary) + '</span>' : ''), kvBlock(Object.keys(pb).map(k => [k, pb[k]]))) : '';
 			}
 
 			function specBlock(p) {
-				const s = p.spec || {};
-				return Object.keys(s).length ? sec('Spec', kvBlock(Object.entries(s))) : '';
+				const sp = p.spec || {};
+				return Object.keys(sp).length ? sec('Spec', kvBlock(Object.keys(sp).map(k => [k, sp[k]]))) : '';
 			}
 
 			function marchBlock(p) {
@@ -1482,7 +1473,19 @@
 				if (!Object.keys(m).length) return '';
 				const types = ['infantry', 'cavalry', 'archer'];
 				const stats = ['attack', 'defense', 'lethality', 'health'];
-				const tbl = '<div class="overflow-auto rounded-xl border border-slate-100"><table class="w-full text-sm"><thead><tr><th class="bg-slate-50 px-4 py-3 text-left text-[11px] uppercase tracking-wider text-slate-500"></th>' + types.map(t => '<th class="bg-slate-50 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">' + esc(t) + '</th>').join('') + '</tr></thead><tbody>' + stats.map(s => '<tr><td class="px-4 py-2.5 text-slate-500 capitalize border-t border-slate-100">' + s + '</td>' + types.map(t => '<td class="px-4 py-2.5 text-center border-t border-slate-100 tabular-nums font-medium">' + esc((m[s] || {})[t] || '-') + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+				let tbl = '<div class="overflow-auto rounded-xl border border-slate-100"><table class="w-full text-sm"><thead><tr><th class="bg-slate-50 px-4 py-3 text-left text-[11px] uppercase tracking-wider text-slate-500"></th>';
+				for (let i = 0; i < types.length; i++) tbl += '<th class="bg-slate-50 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">' + esc(types[i]) + '</th>';
+				tbl += '</tr></thead><tbody>';
+				for (let i = 0; i < stats.length; i++) {
+					const stat = stats[i];
+					tbl += '<tr><td class="px-4 py-2.5 text-slate-500 capitalize border-t border-slate-100">' + stat + '</td>';
+					for (let j = 0; j < types.length; j++) {
+						const v = (m[stat] || {})[types[j]] || '-';
+						tbl += '<td class="px-4 py-2.5 text-center border-t border-slate-100 tabular-nums font-medium">' + esc(v) + '</td>';
+					}
+					tbl += '</tr>';
+				}
+				tbl += '</tbody></table></div>';
 				return sec('March stats', tbl);
 			}
 
@@ -1499,38 +1502,36 @@
 					['Advisor', c.advisor],
 					['Advisor level', c.advisor_level]
 				];
-				if (c.troops) Object.entries(c.troops).forEach(([k, v]) => entries.push(['Troops: ' + k, fmtN(v)]));
+				if (c.troops) Object.keys(c.troops).forEach(k => entries.push(['Troops: ' + k, fmtN(c.troops[k])]));
 				return sec('Championship', kvBlock(entries));
 			}
 
 			function islandBlock(p) {
-				const i = p.island || {};
-				if (!Object.keys(i).length) return '';
-				const b = Object.entries(i.bonuses || {});
-				return sec('Island <span class="hint">prosperity ' + fmtN(i.prosperity) + ' · ' + fmtN(i.likes) + ' likes</span>', b.length ? kvBlock(b) : '<div class="text-slate-400 text-sm">No bonuses.</div>');
-			}
-
-			function normName2(s) {
-				return String(s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+				const is = p.island || {};
+				if (!Object.keys(is).length) return '';
+				const b = Object.keys(is.bonuses || {}).map(k => [k, is.bonuses[k]]);
+				return sec('Island <span class="hint">prosperity ' + fmtN(is.prosperity) + ' · ' + fmtN(is.likes) + ' likes</span>', b.length ? kvBlock(b) : '<div class="text-slate-400 text-sm">No bonuses.</div>');
 			}
 
 			function findPlayerByName(name) {
-				const n = normName2(name);
+				const n = normName(name);
 				if (!n || n === '(this player)') return null;
-				return P.find(p => normName2(p.nickname) === n) || null;
+				for (let i = 0; i < P.length; i++)
+					if (normName(P[i].nickname) === n) return P[i];
+				return null;
 			}
 
-			function playerLink(name, extraClass) {
+			function playerLink(name) {
 				const hit = findPlayerByName(name);
 				if (!hit) return '<span>' + esc(name) + '</span>';
-				return '<a href="#" class="player-link ' + (extraClass || '') + '" data-f="' + esc(hit.fid) + '" title="Open ' + esc(hit.nickname) + '">' + esc(name) + '</a>';
+				return '<a href="#" class="player-link" data-f="' + esc(hit.fid) + '" title="Open ' + esc(hit.nickname) + '">' + esc(name) + '</a>';
 			}
 
 			function compBlock(p) {
 				const c = p.competition || [];
 				if (!c.length) return '';
 				const rows = c.map(x => {
-					const isSelf = normName2(x.name) === normName2(p.nickname) || String(x.power || '').includes('this player');
+					const isSelf = normName(x.name) === normName(p.nickname) || String(x.power || '').indexOf('this player') !== -1;
 					const nameHtml = isSelf ? '<span class="font-semibold text-indigo-700">' + esc(x.name) + '</span>' : playerLink(x.name);
 					return '<div><span>#' + esc(x.rank) + ' ' + nameHtml + '</span><span>' + esc(x.power) + '</span></div>';
 				}).join('');
@@ -1540,10 +1541,7 @@
 			function linkedBlock(p) {
 				const l = p.linked_accounts || [];
 				if (!l.length) return '';
-				const rows = l.map(a => {
-					const label = playerLink(a.name) + ' · ' + esc(a.kingdom || '') + ' · ' + esc(a.tc || '');
-					return '<div><span>' + label + '</span><span>' + esc(a.power) + '</span></div>';
-				}).join('');
+				const rows = l.map(a => '<div><span>' + playerLink(a.name) + ' · ' + esc(a.kingdom || '') + ' · ' + esc(a.tc || '') + '</span><span>' + esc(a.power) + '</span></div>').join('');
 				return sec('Linked accounts', '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>');
 			}
 
@@ -1567,12 +1565,12 @@
 			}
 
 			function loadoutBlock(p) {
-				const l = p.loadout || {};
-				if (!Object.keys(l).length) return '';
+				const lo = p.loadout || {};
+				if (!Object.keys(lo).length) return '';
 				return sec('Loadout', kvBlock([
-					['Gear upgraded', l.gear_upgraded ? 'Yes' : null],
-					['Heroes seen', l.heroes_seen],
-					['Deployed', l.deployed]
+					['Gear upgraded', lo.gear_upgraded ? 'Yes' : null],
+					['Heroes seen', lo.heroes_seen],
+					['Deployed', lo.deployed]
 				]));
 			}
 
@@ -1597,24 +1595,33 @@
 			}
 
 			function chipsBlock(p) {
-				return '<div class="flex flex-wrap gap-2 mb-6">' + CATS.map(c => RK[c.id][p.fid] != null ? '<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>' : '').join('') + (OP[p.fid] != null ? '<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>' : '') + (p.isTransfer ? transferBadgeHTML() : '') + '</div>';
+				const parts = [];
+				for (let i = 0; i < CATS.length; i++) {
+					const c = CATS[i];
+					if (RK[c.id] && RK[c.id][p.fid] != null) {
+						parts.push('<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>');
+					}
+				}
+				if (OP[p.fid] != null) parts.push('<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>');
+				if (p.isTransfer) parts.push(transferBadgeHTML());
+				return '<div class="flex flex-wrap gap-2 mb-6">' + parts.join('') + '</div>';
 			}
 
 			function detailBody(p) {
 				return chipsBlock(p) + coreBlock(p) + leadBlock(p) + troopsBlock(p) + heroesBlock(p) + govBlock(p) + derivedBlock(p) + boardsBlock(p) + powerBlock(p) + specBlock(p) + marchBlock(p) + champBlock(p) + islandBlock(p) + compBlock(p) + linkedBlock(p) + worldBlock(p) + identityBlock(p) + loadoutBlock(p);
 			}
 			/* ------------------------------------------------------------------ */
-			/* Drawer                                                              */
+			/* Drawer                                                             */
 			/* ------------------------------------------------------------------ */
 			function openPlayer(fid) {
 				const p = byFid(fid);
 				if (!p) return;
-				const meta = ['Combat ' + fmtM(p.combatPower), 'Hero power ' + fmtM(p.heroPower), 'Furnace ' + (p.furnaceLevel != null ? p.furnaceLevel : '-'),
+				const metaParts = ['Combat ' + fmtM(p.combatPower), 'Hero power ' + fmtM(p.heroPower), 'Furnace ' + (p.furnaceLevel != null ? p.furnaceLevel : '-'),
 					p.kingdom_rank ? ('Kingdom #' + p.kingdom_rank.rank + '/' + p.kingdom_rank.of) : null,
 					p.ageDays != null ? ('data ' + (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old')) : null
-				].filter(Boolean).join(' · ');
+				].filter(Boolean);
 				const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
-				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(meta) + '</div></div>' + '<button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button>' + '</div>' + '<div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
+				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(metaParts.join(' · ')) + '</div></div><button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button></div><div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
 				$('#overlay').classList.add('active');
 				document.body.style.overflow = 'hidden';
 				$('#drawerClose').onclick = closeDrawer;
@@ -1626,7 +1633,7 @@
 				document.body.style.overflow = '';
 			}
 			/* ------------------------------------------------------------------ */
-			/* CSV export                                                          */
+			/* CSV export                                                         */
 			/* ------------------------------------------------------------------ */
 			function csvCell(v) {
 				if (v == null) return '';
@@ -1637,12 +1644,12 @@
 			function exportCSV() {
 				const head = ['Overall rank', 'Player', 'New transfer', 'Combat power', 'Hero power', 'Furnace level', 'Life tree level', 'Strat score', 'Champ kills', 'Champ lost', 'Island prosperity', 'Island likes', 'Kingdom rank'];
 				const lines = [head.map(csvCell).join(',')];
-				for (const p of tableRows()) {
+				const rows = tableRows();
+				for (let i = 0; i < rows.length; i++) {
+					const p = rows[i];
 					const c = p.championship || {};
-					const i = p.island || {};
-					lines.push([OP[p.fid], p.nickname, p.isTransfer ? 'Yes' : '', p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore,
-						c.killed, c.lost, i.prosperity, i.likes, (p.kingdom_rank || {}).rank
-					].map(csvCell).join(','));
+					const is = p.island || {};
+					lines.push([OP[p.fid], p.nickname, p.isTransfer ? 'Yes' : '', p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore, c.killed, c.lost, is.prosperity, is.likes, (p.kingdom_rank || {}).rank].map(csvCell).join(','));
 				}
 				const blob = new Blob(['\ufeff' + lines.join('\r\n')], {
 					type: 'text/csv;charset=utf-8'
@@ -1699,7 +1706,8 @@
 			$('#overallcats').addEventListener('change', e => {
 				const id = e.target.dataset.c;
 				if (!id) return;
-				e.target.checked ? state.overall.add(id) : state.overall.delete(id);
+				if (e.target.checked) state.overall.add(id);
+				else state.overall.delete(id);
 				if (!state.overall.size) state.overall.add(id);
 				refresh();
 			});
@@ -1721,8 +1729,9 @@
 			function init(data) {
 				D = data || {};
 				P = D.players || [];
-				// Tag new transfers
-				for (const p of P) p.isTransfer = isTransferPlayer(p);
+				for (let i = 0; i < P.length; i++) {
+					P[i].isTransfer = isTransferPlayer(P[i]);
+				}
 				$('#loader').classList.add('hidden');
 				$('#page').classList.remove('hidden');
 				const A = D.alliance || {};
@@ -1738,13 +1747,18 @@
 
 			function showLoader(err) {
 				$('#loader').classList.remove('hidden');
-				$('#loader').innerHTML = '<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm p-10 text-center">' + '<h3 class="text-lg font-semibold mb-2">Load your alliance data</h3>' + (err ? '<p class="text-xs text-slate-500 mb-2">Reason: <code class="bg-slate-100 px-1.5 py-0.5 rounded">' + esc(err.message || String(err)) + '</code></p>' : '') + '<p class="text-sm text-slate-500 mb-5">Browsers block <code class="bg-slate-100 px-1.5 py-0.5 rounded">fetch()</code> on <code class="bg-slate-100 px-1.5 py-0.5 rounded">file://</code>. Serve this folder over HTTP (e.g. <code class="bg-slate-100 px-1.5 py-0.5 rounded">python -m http.server</code>), or drop <code class="bg-slate-100 px-1.5 py-0.5 rounded">alliance_full.json</code> here.</p>' + '<input type="file" id="pick" accept=".json,application/json" class="block mx-auto text-sm">' + '</div>';
+				let reason = '';
+				if (err) {
+					const msg = err.message ? err.message : String(err);
+					reason = '<p class="text-xs text-slate-500 mb-2">Reason: <code class="bg-slate-100 px-1.5 py-0.5 rounded">' + esc(msg) + '</code></p>';
+				}
+				$('#loader').innerHTML = '<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm p-10 text-center"><h3 class="text-lg font-semibold mb-2">Load your alliance data</h3>' + reason + '<p class="text-sm text-slate-500 mb-5">Browsers block <code class="bg-slate-100 px-1.5 py-0.5 rounded">fetch()</code> on <code class="bg-slate-100 px-1.5 py-0.5 rounded">file://</code>. Serve this folder over HTTP (e.g. <code class="bg-slate-100 px-1.5 py-0.5 rounded">python -m http.server</code>), or drop <code class="bg-slate-100 px-1.5 py-0.5 rounded">alliance_full.json</code> here.</p><input type="file" id="pick" accept=".json,application/json" class="block mx-auto text-sm"></div>';
 				const load = f => {
 					const r = new FileReader();
 					r.onload = () => {
 						try {
 							init(JSON.parse(r.result));
-						} catch {
+						} catch (e) {
 							alert('That is not a valid alliance_full.json');
 						}
 					};
