@@ -897,8 +897,8 @@
 			};
 			let P = [];
 			const state = {
-				sortKey: 'overall',
-				sortDir: 1,
+				sortKey: 'combat',
+				sortDir: -1,
 				search: '',
 				overall: new Set(),
 				excludeTransfers: false
@@ -909,7 +909,7 @@
 			/* ------------------------------------------------------------------ */
 			/* New Transfer detection                                             */
 			/* ------------------------------------------------------------------ */
-			const TRANSFER_NAMES = ["KaPTan26", "Unknownᴰᴱᵂ", "Nexia", "Lejana不刻意是我溫柔的伏筆", "Lenaᴰᴱᵂ", "Mishaᴰᴱᵂ", "༒ᏋᏕᏟᎪᏁᎾᏒ༒", "༒ᏆᏕᏕᎻᏆᏦᏆ༒", "乂 PRESTİJ༻", "小姍寶", "亗 S A X 亗", "C̸H̸A̸O̸S̸", "MadaRa", "Queen Rosy", "Slavi124", "Yogogoo", "Zed is dead", "KaPTan26&5", "天氣也好", "Heimy", "Lenaa", "Heros", "Smart", "Roxy", "Peaky Bunniders", "IzDIrAp", "Ciel", "Lenaaaaa"];
+			const TRANSFER_NAMES = ["Alcadraz", "Phyenty", "MonkDragz", "⫷ ꌦꇙꊰ05⫸", "ShadowNv", "HAHAO", "whoopty doo", "Lord Fartquaad", "NotyourKen"];
 
 			function normName(str) {
 				return String(str || '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -935,6 +935,7 @@
 			/* ------------------------------------------------------------------ */
 			/* Governor gear helpers                                              */
 			/* ------------------------------------------------------------------ */
+			// MUST stay in sync with capture.py GOV_BLOCKS.
 			const GOV_BLOCKS = [
 				[3, 'Rare', 0],
 				[7, 'Epic', 0],
@@ -946,7 +947,8 @@
 				[31, 'Legendary', 0],
 				[35, 'Legendary', 1],
 				[39, 'Legendary', 2],
-				[43, 'Legendary', 3]
+				[43, 'Legendary', 3],
+				[47, 'Legendary', 4]
 			];
 
 			function govCode(g) {
@@ -974,6 +976,21 @@
 					tier: b[2],
 					stars: Math.min(3, c - b[0])
 				};
+			}
+
+			// Authoritative values: prefer what capture.py read from the site label.
+			// Only fall back to the ladder when the site gave us no label.
+			function govEffective(g) {
+				if (!g) return null;
+				const q = (g.quality || '').toLowerCase().trim();
+				if (g.decoded === 'label' && (q || g.tier != null || g.stars != null)) {
+					return {
+						quality: q || null,
+						tier: Number(g.tier) || 0,
+						stars: Number(g.stars) || 0
+					};
+				}
+				return govDecode(govCode(g));
 			}
 
 			function govLabelOf(d) {
@@ -1028,13 +1045,14 @@
 			}
 
 			function govIconPath(g) {
+				// Trust the icon path capture.py stored; it was built from the site label.
 				if (g.icon && qualityFromIcon(g.icon)) return g.icon;
 				const eid = Number(g.equip_id) || 0;
 				if (!eid) return g.icon || null;
 				const piece = Math.floor(eid / 1000);
-				const q = govQuality(g);
-				const dec = govDecode(govCode(g));
-				const tier = dec ? (dec.tier || 1) : (Number(g.tier) || 1);
+				const eff = govEffective(g) || {};
+				const q = (eff.quality || '').toLowerCase();
+				const tier = eff.tier || 1;
 				let digit = null;
 				if (q === 'legendary') digit = 5;
 				else if (q === 'mythic') digit = tier >= 2 ? 7 : 4;
@@ -1084,7 +1102,8 @@
 			const CAT = {};
 			for (let i = 0; i < CATS.length; i++) CAT[CATS[i].id] = CATS[i];
 			const TROOPS = ['infantry', 'cavalry', 'archers'];
-			for (let i = 0; i < CATS.length; i++) state.overall.add(CATS[i].id);
+			// DEFAULT FILTER: only Combat power is ticked on first load.
+			state.overall.add('combat');
 
 			function ranksFrom(pairs) {
 				const o = {};
@@ -1177,15 +1196,16 @@
 				let best = null;
 				for (let i = 0; i < gears.length; i++) {
 					const g = gears[i];
-					const q = (g.quality || '').toLowerCase().trim();
+					const eff = govEffective(g);
+					const q = eff ? (eff.quality || '').toLowerCase().trim() : '';
 					if (!q && !g.label) continue;
-					const tier = Number(g.tier) || 0;
-					const stars = Number(g.stars) || 0;
+					const tier = eff ? (eff.tier || 0) : 0;
+					const stars = eff ? (eff.stars || 0) : 0;
 					const score = (Q_ORDER[q] != null ? Q_ORDER[q] : -1) * 100 + tier * 10 + stars;
 					if (!best || score > best.score) {
 						best = {
 							score: score,
-							label: g.label || (q ? (q.charAt(0).toUpperCase() + q.slice(1) + (tier ? ' T' + tier : '') + (stars ? ' · ' + stars + '★' : '')) : null)
+							label: g.label || (eff ? govLabelOf(eff) : null)
 						};
 					}
 				}
@@ -1207,16 +1227,9 @@
 						continue;
 					}
 					const qc = govQualityClass(g);
-					const dec = govDecode(govCode(g));
-					let stars = 0,
-						tier = 0;
-					if (dec) {
-						stars = dec.stars || 0;
-						tier = dec.tier || 0;
-					} else {
-						stars = Number(g.stars) || 0;
-						tier = Number(g.tier) || 0;
-					}
+					const eff = govEffective(g);
+					const stars = eff ? (eff.stars || 0) : 0;
+					const tier = eff ? (eff.tier || 0) : 0;
 					const starRow = '<span class="stars">' + (stars > 0 ? '★'.repeat(stars) : '\u00a0') + '</span>';
 					const tierRow = '<span class="tier">' + (tier > 0 ? 'T' + tier : '\u00a0') + '</span>';
 					const tip = (g.name || '') + ' · ' + (g.label || govQuality(g));
@@ -1440,10 +1453,10 @@
 				const qc = govQualityClass(g);
 				const iconPath = govIconPath(g);
 				const imgs = iconPath ? '<img src="' + esc(iconPath) + '" class="gi2" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
-				const dec = govDecode(govCode(g));
-				const nstars = dec ? dec.stars : (g.stars || 0);
+				const eff = govEffective(g);
+				const nstars = eff ? (eff.stars || 0) : 0;
 				const stars = nstars ? '<span class="st">' + '★'.repeat(nstars) + '</span>' : '';
-				const label = g.label || (dec ? govLabelOf(dec) : (g.quality || ''));
+				const label = g.label || (eff ? govLabelOf(eff) : (g.quality || ''));
 				return '<div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5"><div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div><div class="flex-1 min-w-0"><div class="text-[15px] font-semibold truncate">' + esc(g.name || 'Gear piece') + '</div><div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + '</div>' + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5">ID ' + g.equip_id + (g.progress != null ? ' · progress ' + g.progress : '') + '</div>' : '') + '</div><div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + '</div></div>';
 			}
 
@@ -1621,175 +1634,124 @@
 					p.ageDays != null ? ('data ' + (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old')) : null
 				].filter(Boolean);
 				const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
-				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(metaParts.join(' · ')) + '</div></div><button class="w-11 h-11 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 text-lg" id="drawerClose" aria-label="Close">✕</button></div><div class="p-6 sm:p-8">' + detailBody(p) + '</div>';
+				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(metaParts.join(' · ')) + '</div></div><button class="w-10 h-10 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center flex-none" id="closeDrawer" aria-label="Close"><i class="fas fa-times text-lg"></i></button></div>' + '<div class="px-6 py-6">' + detailBody(p) + '</div>';
 				$('#overlay').classList.add('active');
-				document.body.style.overflow = 'hidden';
-				$('#drawerClose').onclick = closeDrawer;
-				$('#drawer').scrollTop = 0;
 			}
 
 			function closeDrawer() {
 				$('#overlay').classList.remove('active');
-				document.body.style.overflow = '';
 			}
 			/* ------------------------------------------------------------------ */
-			/* CSV export                                                         */
+			/* Wire-up                                                            */
 			/* ------------------------------------------------------------------ */
-			function csvCell(v) {
-				if (v == null) return '';
-				v = String(v);
-				return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
-			}
-
-			function exportCSV() {
-				const head = ['Overall rank', 'Player', 'New transfer', 'Combat power', 'Hero power', 'Furnace level', 'Life tree level', 'Strat score', 'Champ kills', 'Champ lost', 'Island prosperity', 'Island likes', 'Kingdom rank'];
-				const lines = [head.map(csvCell).join(',')];
-				const rows = tableRows();
-				for (let i = 0; i < rows.length; i++) {
-					const p = rows[i];
-					const c = p.championship || {};
-					const is = p.island || {};
-					lines.push([OP[p.fid], p.nickname, p.isTransfer ? 'Yes' : '', p.combatPower, p.heroPower, p.furnaceLevel, p.lifeTreeLevel, p.stratScore, c.killed, c.lost, is.prosperity, is.likes, (p.kingdom_rank || {}).rank].map(csvCell).join(','));
+			document.addEventListener('click', function(e) {
+				const closeBtn = e.target.closest('#closeDrawer');
+				if (closeBtn) return closeDrawer();
+				if (e.target.id === 'overlay') return closeDrawer();
+				const row = e.target.closest('[data-f]');
+				if (row && !e.target.closest('a.player-link')) return openPlayer(row.getAttribute('data-f'));
+				const link = e.target.closest('a.player-link');
+				if (link) {
+					e.preventDefault();
+					return openPlayer(link.getAttribute('data-f'));
 				}
-				const blob = new Blob(['\ufeff' + lines.join('\r\n')], {
-					type: 'text/csv;charset=utf-8'
-				});
-				const a = document.createElement('a');
-				a.href = URL.createObjectURL(blob);
-				a.download = ((D.alliance && D.alliance.abbr) || 'alliance') + '_data.csv';
-				document.body.appendChild(a);
-				a.click();
-				a.remove();
-			}
-			/* ------------------------------------------------------------------ */
-			/* Refresh                                                            */
-			/* ------------------------------------------------------------------ */
-			function refresh() {
-				compute();
-				renderStats();
-				renderTable();
-				renderLeaders();
-				renderCatToggles();
-			}
-			/* ------------------------------------------------------------------ */
-			/* Events                                                             */
-			/* ------------------------------------------------------------------ */
-			$('#csv').onclick = exportCSV;
-			$('#q').oninput = e => {
-				state.search = e.target.value.trim().toLowerCase();
-				renderTable();
-			};
-			$('#excludeTransfers').onclick = e => {
-				state.excludeTransfers = !state.excludeTransfers;
-				e.currentTarget.classList.toggle('on', state.excludeTransfers);
-				renderTable();
-			};
-			$('#tbl').addEventListener('click', e => {
-				const th = e.target.closest('.grid-header');
-				if (th) {
-					const k = th.dataset.k;
+				const hcell = e.target.closest('.grid-header[data-k]');
+				if (hcell) {
+					const k = hcell.getAttribute('data-k');
 					if (state.sortKey === k) state.sortDir *= -1;
 					else {
 						state.sortKey = k;
-						state.sortDir = (k === 'overall' || k === 'name') ? 1 : -1;
+						state.sortDir = 1;
 					}
 					renderTable();
-					return;
 				}
-				const tr = e.target.closest('.grid-row[data-f]');
-				if (tr) openPlayer(tr.dataset.f);
 			});
-			$('#leaders').addEventListener('click', e => {
-				const r = e.target.closest('[data-f]');
-				if (r) openPlayer(r.dataset.f);
-			});
-			$('#overallcats').addEventListener('change', e => {
-				const id = e.target.dataset.c;
-				if (!id) return;
-				if (e.target.checked) state.overall.add(id);
-				else state.overall.delete(id);
-				if (!state.overall.size) state.overall.add(id);
-				refresh();
-			});
-			$('#overlay').addEventListener('click', e => {
-				if (e.target.id === 'overlay') closeDrawer();
-			});
-			$('#drawer').addEventListener('click', e => {
-				const a = e.target.closest('a.player-link[data-f]');
-				if (!a) return;
-				e.preventDefault();
-				openPlayer(a.dataset.f);
-			});
-			document.addEventListener('keydown', e => {
+			document.addEventListener('keydown', function(e) {
 				if (e.key === 'Escape') closeDrawer();
 			});
-			/* ------------------------------------------------------------------ */
-			/* Init / loader                                                      */
-			/* ------------------------------------------------------------------ */
-			function init(data) {
-				D = data || {};
-				P = D.players || [];
-				for (let i = 0; i < P.length; i++) {
-					P[i].isTransfer = isTransferPlayer(P[i]);
+
+			function wireToggles() {
+				const ex = $('#excludeTransfers');
+				if (ex) ex.addEventListener('click', function() {
+					state.excludeTransfers = !state.excludeTransfers;
+					ex.classList.toggle('on', state.excludeTransfers);
+					renderTable();
+				});
+				const q = $('#q');
+				if (q) q.addEventListener('input', function() {
+					state.search = q.value.trim().toLowerCase();
+					renderTable();
+				});
+				const cats = $('#overallcats');
+				if (cats) cats.addEventListener('change', function(e) {
+					const cb = e.target.closest('input[data-c]');
+					if (!cb) return;
+					const id = cb.getAttribute('data-c');
+					if (cb.checked) state.overall.add(id);
+					else state.overall.delete(id);
+					renderCatToggles();
+					compute();
+					renderTable();
+					renderLeaders();
+				});
+				const csv = $('#csv');
+				if (csv) csv.addEventListener('click', exportCSV);
+			}
+
+			function exportCSV() {
+				const cols = ['fid', 'nickname', 'combatPower', 'heroPower', 'overall_rank'];
+				for (let i = 0; i < CATS.length; i++) cols.push(CATS[i].id + '_rank');
+				cols.push('gov_label', 'charm_sum', 'troop_score');
+				const lines = [cols.join(',')];
+				const rows = tableRows();
+				for (let i = 0; i < rows.length; i++) {
+					const p = rows[i];
+					const vals = [p.fid, p.nickname, p.combatPower, p.heroPower, OP[p.fid] || ''];
+					for (let j = 0; j < CATS.length; j++) vals.push((RK[CATS[j].id] && RK[CATS[j].id][p.fid]) || '');
+					vals.push(govLabel(p), dd(p).charm_level_sum_guess || '', dd(p).troop_score || '');
+					lines.push(vals.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(','));
 				}
+				const blob = new Blob([lines.join('\n')], {
+					type: 'text/csv'
+				});
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(blob);
+				a.download = 'alliance.csv';
+				a.click();
+			}
+
+			async function load() {
+				$('#loader').classList.remove('hidden');
+				try {
+					const r = await fetch('alliance_full.json', {
+						cache: 'no-store'
+					});
+					if (!r.ok) throw new Error('HTTP ' + r.status);
+					D = await r.json();
+				} catch (e) {
+					$('#loader').innerHTML = '<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center"><div class="text-rose-500 text-4xl mb-3"><i class="fas fa-triangle-exclamation"></i></div><p class="text-slate-700 font-semibold">Could not load alliance_full.json</p><p class="text-slate-500 text-sm mt-1">' + esc(e.message) + '</p><p class="text-slate-400 text-xs mt-3">Run capture.py first, then serve this folder over HTTP (e.g. <code>python -m http.server</code>).</p></div>';
+					return;
+				}
+				P = (D.players || []).map(p => Object.assign({}, p, {
+					isTransfer: isTransferPlayer(p)
+				}));
+				const a = D.alliance || {};
+				$('#title').textContent = a.name || 'Alliance';
+				$('#subtitle').textContent = (a.abbr ? '[' + a.abbr + '] · ' : '') + 'AID ' + (a.aid || '-') + ' · ' + P.length + ' players';
+				$('#memberCount').textContent = P.length + ' members';
+				$('#brandLogo').textContent = (a.abbr || a.name || 'A').trim().charAt(0).toUpperCase();
+				document.title = (a.name || 'Alliance') + ' · Data Viewer';
+				compute();
+				renderCatToggles();
+				renderTable();
+				renderLeaders();
+				renderStats();
+				wireToggles();
+				$('#foot').innerHTML = 'Scraped ' + (D.scraped_players || P.length) + ' players · images under <code>images/</code> · data from <code>alliance_full.json</code>';
 				$('#loader').classList.add('hidden');
 				$('#page').classList.remove('hidden');
-				const A = D.alliance || {};
-				const name = A.name || A.abbr || 'Alliance';
-				document.title = name + ' · Data Viewer';
-				$('#title').textContent = name;
-				$('#subtitle').textContent = P.length + ' of ' + (A.member_count || P.length) + ' members loaded';
-				$('#brandLogo').textContent = (A.abbr || name || 'A').slice(0, 2).toUpperCase();
-				$('#memberCount').innerHTML = '<b class="text-slate-700">' + P.length + '</b> members';
-				$('#foot').textContent = 'Furnace = Town Center upgrade tier. Troop data = top tier per troop type. Lead heroes show Widget level (hero widget upgrade). Charm numbers are estimated levels. Governor gear is ranked by total upgrade progress; the label shown is the best piece (quality/tier/stars from the game). Overall rank = average of ranks across the ticked categories. "New Transfer" = governor listed as [DEW] in the power/town-center tracker and matched by nickname. The "Except new transfers" toggle hides those players from the table.';
-				refresh();
 			}
-
-			function showLoader(err) {
-				$('#loader').classList.remove('hidden');
-				let reason = '';
-				if (err) {
-					const msg = err.message ? err.message : String(err);
-					reason = '<p class="text-xs text-slate-500 mb-2">Reason: <code class="bg-slate-100 px-1.5 py-0.5 rounded">' + esc(msg) + '</code></p>';
-				}
-				$('#loader').innerHTML = '<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-sm p-10 text-center"><h3 class="text-lg font-semibold mb-2">Load your alliance data</h3>' + reason + '<p class="text-sm text-slate-500 mb-5">Browsers block <code class="bg-slate-100 px-1.5 py-0.5 rounded">fetch()</code> on <code class="bg-slate-100 px-1.5 py-0.5 rounded">file://</code>. Serve this folder over HTTP (e.g. <code class="bg-slate-100 px-1.5 py-0.5 rounded">python -m http.server</code>), or drop <code class="bg-slate-100 px-1.5 py-0.5 rounded">alliance_full.json</code> here.</p><input type="file" id="pick" accept=".json,application/json" class="block mx-auto text-sm"></div>';
-				const load = f => {
-					const r = new FileReader();
-					r.onload = () => {
-						try {
-							init(JSON.parse(r.result));
-						} catch (e) {
-							alert('That is not a valid alliance_full.json');
-						}
-					};
-					r.readAsText(f);
-				};
-				$('#pick').onchange = e => {
-					if (e.target.files[0]) load(e.target.files[0]);
-				};
-				document.addEventListener('dragover', e => e.preventDefault());
-				document.addEventListener('drop', e => {
-					e.preventDefault();
-					if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
-				});
-			}
-			Promise.all([
-				fetch('alliance_full.json').then(r => {
-					if (!r.ok) throw new Error('HTTP ' + r.status);
-					return r.json();
-				}),
-				fetch('names.json').then(r => r.ok ? r.json() : {
-					hero: {}
-				}).catch(() => ({
-					hero: {}
-				}))
-			]).then(([data, names]) => {
-				NAMES = names || {
-					hero: {}
-				};
-				init(data);
-			}).catch(showLoader);
-
+			load();
 		</script>
 	</body>
 
