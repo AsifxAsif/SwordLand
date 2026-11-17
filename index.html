@@ -782,7 +782,7 @@
 		<!-- Header -->
 		<header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
 			<div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 flex items-center gap-4 flex-wrap">
-				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20">A</div>
+				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20"> A</div>
 				<div class="min-w-0">
 					<h1 id="title" class="text-lg sm:text-xl font-bold leading-tight truncate">Alliance</h1>
 					<p class="text-xs text-slate-500 truncate" id="subtitle">Data viewer</p>
@@ -977,7 +977,6 @@
 					stars: Math.min(3, c - b[0])
 				};
 			}
-
 			// Authoritative values: prefer what capture.py read from the site label.
 			// Only fall back to the ladder when the site gave us no label.
 			function govEffective(g) {
@@ -1007,6 +1006,7 @@
 				"3": 'epic',
 				"4": 'mythic',
 				"5": 'legendary',
+				"6": 'legendary',
 				"7": 'mythic'
 			};
 			const ICON_RE = /lordsequipment_icon_\d+(\d)\.png$/;
@@ -1046,7 +1046,7 @@
 
 			function govIconPath(g) {
 				// Trust the icon path capture.py stored; it was built from the site label.
-				if (g.icon && qualityFromIcon(g.icon)) return g.icon;
+				if (g.icon && qualityFromIcon(g.icon) === govQuality(g)) return g.icon;
 				const eid = Number(g.equip_id) || 0;
 				if (!eid) return g.icon || null;
 				const piece = Math.floor(eid / 1000);
@@ -1054,7 +1054,7 @@
 				const q = (eff.quality || '').toLowerCase();
 				const tier = eff.tier || 1;
 				let digit = null;
-				if (q === 'legendary') digit = 5;
+				if (q === 'legendary') digit = tier >= 4 ? 6 : 5;
 				else if (q === 'mythic') digit = tier >= 2 ? 7 : 4;
 				else if (q === 'epic') digit = 3;
 				else if (q === 'rare') digit = 2;
@@ -1719,7 +1719,6 @@
 				a.download = 'alliance.csv';
 				a.click();
 			}
-
 			async function load() {
 				$('#loader').classList.remove('hidden');
 				try {
@@ -1752,6 +1751,7 @@
 				$('#page').classList.remove('hidden');
 			}
 			load();
+
 		</script>
 	</body>
 
