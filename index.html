@@ -98,7 +98,7 @@
 			.grid-row {
 				display: grid;
 				grid-template-columns:
-					50px 350px 100px 100px 200px 375px 275px;
+					75px 300px 112px 113px 200px 375px 275px;
 				align-items: center;
 				border-bottom: 1px solid #e5e7eb;
 				transition: background 0.1s;
@@ -931,8 +931,7 @@
 			</div>
 		</div>
 		<main id="page" class="max-w-[1600px] mx-auto p-4 sm:p-6 hidden">
-			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8" id="statGrid"></div>
-			<!-- Leaderboard card removed -->
+			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6" id="statGrid"></div>
 			<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 				<div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
 					<div class="min-w-0">
@@ -940,6 +939,7 @@
 						<p class="text-xs text-slate-500">Click any row to open the full dossier</p>
 					</div>
 					<div class="flex-1"></div>
+					<div class="flex flex-wrap gap-2" id="overallcats"></div>
 					<button id="excludeTransfers" class="chip-toggle exclude-toggle" title="Hide players recently transferred into DEW">
 						<span class="dot"></span> Except new transfers </button>
 					<div class="relative">
@@ -949,16 +949,11 @@
 					<button id="csv" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition">
 						<i class="fas fa-download"></i> Export CSV </button>
 				</div>
-				<div class="px-6 py-3 border-b border-slate-100 flex flex-wrap items-center gap-2">
-					<span class="text-xs text-slate-500">Overall rank = average across ticked categories:</span>
-					<div class="flex flex-wrap gap-2" id="overallcats"></div>
-				</div>
-				<div class="overflow-x-hidden overflow-y-auto max-h-[calc(100vh-280px)]">
+				<div class="overflow-x-hidden overflow-y-auto max-h-[calc(100vh-340px)]">
 					<div id="tbl" class="grid-table"></div>
 				</div>
 			</div>
 		</main>
-		<footer class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 text-xs text-slate-500 border-t border-slate-200 mt-6" id="foot"></footer>
 		<div class="modal-overlay" id="overlay">
 			<div class="modal-card" id="drawer" role="dialog" aria-modal="true"></div>
 		</div>
@@ -1889,7 +1884,6 @@
 				renderTable();
 				renderStats();
 				wireToggles();
-				$('#foot').innerHTML = 'Scraped ' + (D.scraped_players || P.length) + ' players · images under <code>images/</code> · data from <code>alliance_full.json</code>';
 				$('#loader').classList.add('hidden');
 				$('#page').classList.remove('hidden');
 			}
