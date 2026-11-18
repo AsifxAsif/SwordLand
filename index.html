@@ -50,6 +50,13 @@
 				--t-sky: #4b8fd1;
 				--t-green: #7fbf7f;
 				--t-grey: #5f6977;
+				/* enhance +N tier colours */
+				--plus-grey: #acacac;
+				--plus-green: #5ed387;
+				--plus-sky: #64bceb;
+				--plus-purple: #c792ff;
+				--plus-mango: #ffe062;
+				--plus-red: #ff6a6a;
 			}
 
 			html,
@@ -239,6 +246,31 @@
 				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 			}
 
+			.lead-widget {
+				display: inline-flex;
+				align-items: center;
+				gap: 3px;
+				font-size: 9.5px;
+				font-weight: 700;
+				color: #4338ca;
+				background: #eef2ff;
+				border: 1px solid #c7d2fe;
+				border-radius: 999px;
+				padding: 1px 6px;
+				line-height: 1.3;
+				font-variant-numeric: tabular-nums;
+			}
+
+			.lead-widget img {
+				width: 14px;
+				height: 14px;
+				border-radius: 3px;
+				object-fit: contain;
+				background: transparent;
+				border: none;
+				box-shadow: none;
+			}
+
 			/* ---------- Governor gear / charm icon grids ---------- */
 			.gear-icon-grid {
 				display: grid;
@@ -296,7 +328,6 @@
 				line-height: 1;
 			}
 
-			/* Quality backgrounds for table and modal */
 			.q-legendary {
 				background: var(--q-legendary);
 				border: 1px solid rgba(0, 0, 0, 0.3);
@@ -369,7 +400,6 @@
 				font-variant-numeric: tabular-nums;
 			}
 
-			/* ---------- Avatars ---------- */
 			.av {
 				position: relative;
 				width: 36px;
@@ -403,7 +433,6 @@
 				border-width: 3px;
 			}
 
-			/* ---------- Rank chips ---------- */
 			.rk {
 				display: inline-block;
 				font-size: 10px;
@@ -437,7 +466,6 @@
 				color: #065f46;
 			}
 
-			/* ---------- Hero / Governor Gear (Modal details) ---------- */
 			.gi {
 				width: 100%;
 				max-width: 56px;
@@ -481,33 +509,142 @@
 				border-color: var(--t-grey);
 			}
 
-			.forge-badge {
+			/* ---------- NEW hero gear overlays ---------- */
+			/* Forgehammer level badge — bottom right */
+			.gear-forge-badge {
 				position: absolute;
-				top: 2px;
-				left: 2px;
+				bottom: 2px;
+				right: 2px;
 				z-index: 5;
 				display: inline-flex;
 				align-items: center;
 				gap: 2px;
 				background: rgba(15, 23, 42, 0.88);
 				color: #f8fafc;
-				font-size: 10px;
+				font-size: 9px;
 				font-weight: 700;
 				line-height: 1;
-				padding: 1px 5px 1px 2px;
+				padding: 1px 4px 1px 2px;
 				border-radius: 5px;
 				pointer-events: none;
+				font-variant-numeric: tabular-nums;
 			}
 
-			.forge-badge img {
-				width: 14px;
-				height: 14px;
+			.gear-forge-badge img {
+				width: 11px;
+				height: 11px;
 				object-fit: contain;
 				display: block;
 				flex: none;
 			}
 
-			/* Fixed modal gear wrapper to contain stars */
+			/* +N enhance oval — top right */
+			.gear-plus-badge {
+				position: absolute;
+				top: -6px;
+				right: -6px;
+				z-index: 6;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 30px;
+				height: 18px;
+				padding: 0 7px;
+				border-radius: 999px;
+				font-size: 10.5px;
+				font-weight: 800;
+				line-height: 1;
+				color: #111827;
+				border: 1px solid rgba(0, 0, 0, 0.15);
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+			}
+
+			.gear-plus-badge.p-grey {
+				background: var(--plus-grey);
+			}
+
+			.gear-plus-badge.p-green {
+				background: var(--plus-green);
+			}
+
+			.gear-plus-badge.p-sky {
+				background: var(--plus-sky);
+			}
+
+			.gear-plus-badge.p-purple {
+				background: var(--plus-purple);
+			}
+
+			.gear-plus-badge.p-mango {
+				background: var(--plus-mango);
+			}
+
+			.gear-plus-badge.p-red {
+				background: var(--plus-red);
+			}
+
+			/* Widget tile (gold) inside hero modal card */
+			.widget-tile {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 2px;
+			}
+
+			.widget-frame {
+				width: 56px;
+				height: 56px;
+				border-radius: 8px;
+				padding: 3px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-sizing: border-box;
+				position: relative;
+				background: var(--gold);
+				border: 2px solid #b8912a;
+				box-shadow: 0 1px 4px rgba(184, 145, 42, 0.35);
+				overflow: visible;
+			}
+
+			.widget-frame img {
+				width: 100%;
+				height: 100%;
+				border-radius: 5px;
+				object-fit: contain;
+				display: block;
+				background: transparent;
+			}
+
+			/* widget +N level — top right */
+			.widget-frame .wlv {
+				position: absolute;
+				top: -6px;
+				right: -6px;
+				background: rgba(15, 23, 42, 0.92);
+				color: #fde68a;
+				font-size: 10.5px;
+				font-weight: 800;
+				padding: 1px 6px;
+				border-radius: 999px;
+				border: 1px solid #b8912a;
+				line-height: 1.3;
+				font-variant-numeric: tabular-nums;
+				z-index: 3;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+			}
+
+			.widget-label {
+				font-size: 9px;
+				font-weight: 700;
+				color: #8a6a1a;
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				line-height: 1;
+			}
+
 			.modal-gear-wrapper {
 				position: relative;
 				width: 64px;
@@ -548,7 +685,6 @@
 				pointer-events: none;
 			}
 
-			/* ---------- Key/value ---------- */
 			.kv>div {
 				display: flex;
 				justify-content: space-between;
@@ -603,7 +739,6 @@
 				border-bottom-color: #3730a3;
 			}
 
-			/* ---------- New Transfer badge ---------- */
 			.transfer-badge {
 				display: inline-block;
 				font-size: 9px;
@@ -633,7 +768,6 @@
 				box-shadow: 0 0 3px rgba(255, 255, 255, .9);
 			}
 
-			/* ---------- Modal ---------- */
 			.modal-overlay {
 				position: fixed;
 				inset: 0;
@@ -669,7 +803,6 @@
 				transform: translateY(0);
 			}
 
-			/* ---------- Toggle chips ---------- */
 			.chip-toggle {
 				display: inline-flex;
 				align-items: center;
@@ -730,7 +863,6 @@
 				background: #fff;
 			}
 
-			/* ---------- Spinner ---------- */
 			.spinner {
 				border: 4px solid #e5e7eb;
 				border-top: 4px solid #4f46e5;
@@ -746,7 +878,6 @@
 				}
 			}
 
-			/* ---------- Section header ---------- */
 			.sec-h {
 				display: flex;
 				align-items: center;
@@ -779,7 +910,6 @@
 	</head>
 
 	<body class="min-h-screen">
-		<!-- Header -->
 		<header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
 			<div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 flex items-center gap-4 flex-wrap">
 				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20"> A</div>
@@ -794,26 +924,15 @@
 				</div>
 			</div>
 		</header>
-		<!-- Loader -->
 		<div id="loader" class="p-8 hidden">
 			<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center">
 				<div class="spinner mx-auto mb-5"></div>
 				<p class="text-slate-500 text-sm">Loading alliance data…</p>
 			</div>
 		</div>
-		<!-- Main -->
 		<main id="page" class="max-w-[1600px] mx-auto p-4 sm:p-6 hidden">
-			<!-- Stat cards -->
 			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8" id="statGrid"></div>
-			<!-- Leaders -->
-			<div class="bg-white rounded-2xl shadow-sm mb-8 overflow-hidden">
-				<div class="px-6 py-4 border-b border-slate-100 flex items-center gap-3 flex-wrap">
-					<h2 class="text-base font-semibold">Leaderboard — top 3 per category</h2>
-					<span class="text-xs text-slate-500">Click a name to open the full dossier</span>
-				</div>
-				<div class="p-6 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" id="leaders"></div>
-			</div>
-			<!-- Members table -->
+			<!-- Leaderboard card removed -->
 			<div class="bg-white rounded-2xl shadow-sm overflow-hidden">
 				<div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
 					<div class="min-w-0">
@@ -840,14 +959,10 @@
 			</div>
 		</main>
 		<footer class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 text-xs text-slate-500 border-t border-slate-200 mt-6" id="foot"></footer>
-		<!-- Drawer / Modal -->
 		<div class="modal-overlay" id="overlay">
 			<div class="modal-card" id="drawer" role="dialog" aria-modal="true"></div>
 		</div>
 		<script>
-			/* ------------------------------------------------------------------ */
-			/* Safe helpers (no shadowed identifiers)                              */
-			/* ------------------------------------------------------------------ */
 			const $ = (sel, root) => (root || document).querySelector(sel);
 
 			function esc(val) {
@@ -887,10 +1002,43 @@
 				}
 			}
 			const heroIcon = id => 'images/kingshot/heroes/hero_headpic_' + id + '.png';
-			const heroName = id => (NAMES && NAMES.hero && NAMES.hero[String(id)]) || 'Unknown hero';
-			/* ------------------------------------------------------------------ */
-			/* State                                                              */
-			/* ------------------------------------------------------------------ */
+
+			function heroName(id, player) {
+				const key = String(id);
+				if (NAMES && NAMES.hero && NAMES.hero[key]) return NAMES.hero[key];
+				if (player && Array.isArray(player.heroes)) {
+					for (let i = 0; i < player.heroes.length; i++) {
+						const h = player.heroes[i];
+						if (String(h.hero_id) === key && h.name) return h.name;
+					}
+				}
+				return 'Unknown hero';
+			}
+
+			function widgetIcon(id, player) {
+				const name = heroName(id, player);
+				if (!name || name === 'Unknown hero') return null;
+				const slug = name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+				if (!slug) return null;
+				return 'images/kingshot/widget/' + slug + '_widget.webp';
+			}
+			/* Widget level = hero.exclusive.level */
+			function widgetLevelFromHero(hero) {
+				if (!hero || !hero.exclusive) return null;
+				const lv = hero.exclusive.level;
+				if (lv == null || isNaN(Number(lv))) return null;
+				return Number(lv);
+			}
+			/* Enhance +N tier colour */
+			function plusTierClass(plus) {
+				if (plus <= 0) return '';
+				if (plus <= 19) return 'p-grey';
+				if (plus <= 39) return 'p-green';
+				if (plus <= 59) return 'p-sky';
+				if (plus <= 79) return 'p-purple';
+				if (plus <= 99) return 'p-mango';
+				return 'p-red';
+			}
 			let D = {};
 			let NAMES = {
 				hero: {}
@@ -906,9 +1054,6 @@
 			let RK = {},
 				OV = {},
 				OP = {};
-			/* ------------------------------------------------------------------ */
-			/* New Transfer detection                                             */
-			/* ------------------------------------------------------------------ */
 			const TRANSFER_NAMES = ["Alcadraz", "Phyenty", "MonkDragz", "⫷ ꌦꇙꊰ05⫸", "ShadowNv", "HAHAO", "whoopty doo", "Lord Fartquaad", "NotyourKen"];
 
 			function normName(str) {
@@ -932,10 +1077,6 @@
 			function transferBadgeHTML() {
 				return '<span class="transfer-badge" title="Recently transferred into DEW"><span class="tb-dot"></span>New Transfer</span>';
 			}
-			/* ------------------------------------------------------------------ */
-			/* Governor gear helpers                                              */
-			/* ------------------------------------------------------------------ */
-			// MUST stay in sync with capture.py GOV_BLOCKS.
 			const GOV_BLOCKS = [
 				[3, 'Rare', 0],
 				[7, 'Epic', 0],
@@ -977,8 +1118,7 @@
 					stars: Math.min(3, c - b[0])
 				};
 			}
-			// Authoritative values: prefer what capture.py read from the site label.
-			// Only fall back to the ladder when the site gave us no label.
+
 			function govEffective(g) {
 				if (!g) return null;
 				const q = (g.quality || '').toLowerCase().trim();
@@ -1045,7 +1185,6 @@
 			}
 
 			function govIconPath(g) {
-				// Trust the icon path capture.py stored; it was built from the site label.
 				if (g.icon && qualityFromIcon(g.icon) === govQuality(g)) return g.icon;
 				const eid = Number(g.equip_id) || 0;
 				if (!eid) return g.icon || null;
@@ -1062,9 +1201,6 @@
 				if (digit != null) return 'images/kingshot/lord-gear/lordsequipment_icon_' + piece + '00' + digit + '.png';
 				return g.icon || null;
 			}
-			/* ------------------------------------------------------------------ */
-			/* Categories                                                         */
-			/* ------------------------------------------------------------------ */
 			const CATS = [{
 				id: 'combat',
 				label: 'Combat power',
@@ -1102,7 +1238,6 @@
 			const CAT = {};
 			for (let i = 0; i < CATS.length; i++) CAT[CATS[i].id] = CATS[i];
 			const TROOPS = ['infantry', 'cavalry', 'archers'];
-			// DEFAULT FILTER: only Combat power is ticked on first load.
 			state.overall.add('combat');
 
 			function ranksFrom(pairs) {
@@ -1159,9 +1294,7 @@
 					if (P[i].fid === fid) return P[i];
 				return null;
 			}
-			/* ------------------------------------------------------------------ */
-			/* Rendering helpers                                                  */
-			/* ------------------------------------------------------------------ */
+
 			function rankChip(r) {
 				return r == null ? '' : '<span class="rk ' + (r <= 3 ? 'r' + r : (r <= 10 ? 'top' : '')) + '">#' + r + '</span>';
 			}
@@ -1265,9 +1398,7 @@
 				if (c.cell === 'charm') return '<div class="cell-main">' + govCharmImages(p) + rk + '</div>';
 				return '<div class="cell-main"><span class="cell-val">' + c.fmt(v) + '</span>' + rk + '</div>';
 			}
-			/* ------------------------------------------------------------------ */
-			/* Table                                                              */
-			/* ------------------------------------------------------------------ */
+
 			function tableRows() {
 				const q = state.search;
 				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().indexOf(q) !== -1);
@@ -1289,6 +1420,19 @@
 				return rows;
 			}
 
+			function leadChipsHTML(p) {
+				const lead = p.lead || [];
+				if (!lead.length) return '';
+				const parts = [];
+				for (let j = 0; j < lead.length; j++) {
+					const l = lead[j];
+					const nm = heroName(l.id, p);
+					const title = nm;
+					parts.push('<span class="lead-chip" title="' + esc(title) + '">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" onerror="this.style.opacity=0.15">' + '<span>' + esc(nm) + '</span>' + '</span>');
+				}
+				return parts.join('');
+			}
+
 			function renderTable() {
 				const rows = tableRows();
 				const th = (key, label, cls) => '<div class="grid-cell grid-header ' + (cls || '') + ' ' + (state.sortKey === key ? 'text-indigo-600' : '') + '" data-k="' + key + '">' + label + ' ' + (state.sortKey === key ? (state.sortDir > 0 ? '▲' : '▼') : '') + '</div>';
@@ -1302,49 +1446,24 @@
 				let h = '<div class="grid-row grid-header">' + th('overall', 'Rank', 'rank') + th('name', 'Player', 'pl') + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join('') + '</div>';
 				for (let i = 0; i < rows.length; i++) {
 					const p = rows[i];
-					const leadParts = [];
-					const lead = p.lead || [];
-					for (let j = 0; j < lead.length; j++) {
-						const l = lead[j];
-						const nm = heroName(l.id);
-						const wl = l.widgetLevel != null ? ' · W' + l.widgetLevel : '';
-						leadParts.push('<span class="lead-chip" title="' + esc(nm) + (l.widgetLevel != null ? ' · Widget level ' + l.widgetLevel : '') + '"><img src="' + esc(heroIcon(l.id)) + '" alt="" onerror="this.style.opacity=0.15"> ' + esc(nm) + wl + '</span>');
-					}
-					const leads = leadParts.join('');
+					const leads = leadChipsHTML(p);
 					const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
 					h += '<div class="grid-row ' + (p.isTransfer ? 'is-transfer' : '') + '" data-f="' + p.fid + '">' + '<div class="grid-cell rank font-bold text-indigo-700">' + (OP[p.fid] != null ? '#' + OP[p.fid] : '-') + '</div>' + '<div class="grid-cell pl"><div class="flex items-center gap-3">' + avatar(p) + '<div class="min-w-0" style="overflow:hidden"><div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.nickname) + transferBadge + '</div>' + (leads ? '<div class="lead-row">' + leads + '</div>' : '') + '</div></div></div>' + CATS.map(c => '<div class="grid-cell" title="' + esc(c.label) + '">' + cellHTML(c, p) + '</div>').join('') + '</div>';
 				}
 				$('#tbl').innerHTML = h;
 			}
-			/* ------------------------------------------------------------------ */
-			/* Stat cards                                                         */
-			/* ------------------------------------------------------------------ */
+
 			function renderStats() {
 				const total = P.length;
 				const avg = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
 				const combats = P.map(p => p.combatPower).filter(x => x != null);
 				const furnaces = P.map(p => p.furnaceLevel).filter(x => x != null);
-				const islandPros = P.map(p => (p.island || {}).prosperity).filter(x => x != null);
 				const champKills = P.map(p => (p.championship || {}).killed).filter(x => x != null);
 				const top = P.slice().sort((a, b) => b.combatPower - a.combatPower)[0];
 				const oldest = P.filter(p => p.ageDays != null).sort((a, b) => b.ageDays - a.ageDays)[0];
 				const transferCount = P.filter(p => p.isTransfer).length;
 				const card = (label, value, sub, icon, color) => '<div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">' + label + '</div><div class="text-2xl font-bold mt-1 tabular-nums">' + value + '</div><div class="text-[11.5px] text-slate-500 mt-1 truncate">' + sub + '</div></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none ' + color + '"><i class="fas ' + icon + ' text-xl"></i></div></div></div>';
 				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('New transfers', transferCount, transferCount ? '<b>' + transferCount + '</b> recently joined DEW' : 'none matched', 'fa-arrow-right-to-bracket', 'bg-amber-100 text-amber-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max.apply(null, furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
-			}
-			/* ------------------------------------------------------------------ */
-			/* Leaders                                                            */
-			/* ------------------------------------------------------------------ */
-			function renderLeaders() {
-				const blocks = [];
-				for (let i = 0; i < CATS.length; i++) {
-					const c = CATS[i];
-					const top = P.map(p => [p, c.get(p)]).filter(x => x[1] != null).sort((a, b) => b[1] - a[1]).slice(0, 3);
-					const disp = p => c.id === 'troops' ? TROOPS.map(k => p.troops && p.troops[k] ? 'T' + p.troops[k].tier : '-').join('/') : c.id === 'gov' ? govLabel(p) : c.fmt(c.get(p));
-					const rows = top.map(x => '<div class="flex justify-between items-center py-1.5 text-[13px] cursor-pointer hover:text-indigo-600 border-b border-slate-100 last:border-0" data-f="' + x[0].fid + '"><span class="truncate font-medium">' + esc(x[0].nickname) + '</span><span class="text-slate-500 tabular-nums ml-2">' + disp(x[0]) + '</span></div>').join('');
-					blocks.push('<div class="bg-slate-50 rounded-xl p-4 border border-slate-100"><h3 class="text-[11px] uppercase tracking-widest font-bold text-slate-500 mb-3 flex items-center gap-2"><i class="fas ' + c.icon + ' text-indigo-500"></i>' + esc(c.label) + '</h3>' + rows + '</div>');
-				}
-				$('#leaders').innerHTML = blocks.join('');
 			}
 
 			function renderCatToggles() {
@@ -1356,9 +1475,7 @@
 				}
 				$('#overallcats').innerHTML = out.join('');
 			}
-			/* ------------------------------------------------------------------ */
-			/* Detail drawer sections                                             */
-			/* ------------------------------------------------------------------ */
+
 			function sec(title, body, hint) {
 				return '<div class="mb-7"><h3 class="sec-h">' + esc(title) + (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</h3>' + body + '</div>';
 			}
@@ -1406,7 +1523,10 @@
 			function leadBlock(p) {
 				const lead = p.lead || [];
 				if (!lead.length) return '';
-				const chips = lead.map(l => '<span class="chip"><img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15"><b>' + esc(heroName(l.id)) + '</b>' + (l.widgetLevel != null ? ' · widget <b>' + l.widgetLevel + '</b>' : '') + '</span>').join('');
+				const chips = lead.map(l => {
+					const nm = heroName(l.id, p);
+					return '<span class="chip" style="gap:8px">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15">' + '<b>' + esc(nm) + '</b>' + '</span>';
+				}).join('');
 				return sec('Lead heroes', '<div class="flex flex-wrap gap-2.5">' + chips + '</div>');
 			}
 
@@ -1431,21 +1551,38 @@
 				if (t === 2) return 'gi t2';
 				return 'gi t1';
 			}
-
-			function heroHTML(h) {
+			/* MODAL HERO CARD — gear tiles (forge bottom-right, +N top-right oval) + gold widget tile (+N top-right) */
+			function heroHTML(h, p) {
 				const gear = (h.gear || []).map(g => {
 					const tip = (g.name || 'Gear') + ' · Forge ' + g.refine + ' · Lv' + g.enhance_level + (g.enhance_plus ? ' +' + g.enhance_plus : '') + (g.exp != null ? ' · XP ' + g.exp : '');
-					const forge = (g.refine != null && g.refine > 0) ? '<span class="forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">' + g.refine + '</span>' : '';
-					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + (g.enhance_level != null ? g.enhance_level : 0) + (g.enhance_plus ? '<b class="text-emerald-600">+' + g.enhance_plus + '</b>' : '') + '</span>' + (g.name ? '<span class="block text-[9px] text-slate-400 truncate mt-0.5" style="max-width:64px;margin:0 auto">' + esc(g.name) + '</span>' : '') + '</div>';
+					/* Forge level — bottom right */
+					const forge = (g.refine != null && Number(g.refine) > 0) ? '<span class="gear-forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">Lv. ' + g.refine + '</span>' : '';
+					/* Enhance +N oval — top right */
+					const plus = Number(g.enhance_plus) || 0;
+					const plusTier = plusTierClass(plus);
+					const plusBadge = (plus > 0) ? '<span class="gear-plus-badge ' + plusTier + '">+' + plus + '</span>' : '';
+					/* Under the icon: base enhance level text (no oval), e.g. 100 */
+					const baseLevel = g.enhance_level != null ? g.enhance_level : 0;
+					const baseLine = '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + baseLevel + '</span>';
+					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + plusBadge + baseLine + '</div>';
 				}).join('');
+				/* Widget level = hero.exclusive.level, shown as +N top-right of gold frame */
+				const wLvl = widgetLevelFromHero(h);
+				const wSrc = widgetIcon(h.hero_id, p);
+				let widgetTile = '';
+				if (wLvl != null) {
+					widgetTile = '<div class="widget-tile" title="Hero widget · Level ' + wLvl + '">' + '<div class="widget-frame">' + (wSrc ? '<img src="' + esc(wSrc) + '" alt="" loading="lazy" onerror="this.style.opacity=.25">' : '') + '<span class="wlv">+' + wLvl + '</span>' + '</div>' + '<span class="widget-label">Widget</span>' + '</div>';
+				}
 				const ex = h.exclusive ? ' · Exclusive Lv' + h.exclusive.level : '';
 				const skills = (h.skills || []).map(sk => esc(sk.name || ('Skill ' + sk.id)) + ' Lv' + (sk.level != null ? sk.level : 0)).join(' · ');
-				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col"><div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(heroName(h.hero_id) || h.name || ('Hero ' + h.hero_id)) + '</div><div class="text-[12px] text-slate-500">' + (h.star != null ? h.star : 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div></div><div class="text-[11px] text-slate-500 mb-2 truncate" title="' + esc(skills) + '" style="min-height:16px">' + esc(skills) + '</div><div class="grid grid-cols-4 gap-2 mt-auto">' + gear + '</div></div>';
+				const name = heroName(h.hero_id, p) || h.name || ('Hero ' + h.hero_id);
+				const gearCols = wLvl != null ? 'grid-cols-5' : 'grid-cols-4';
+				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col">' + '<div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(name) + '</div><div class="text-[12px] text-slate-500">' + (h.star != null ? h.star : 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div>' + '</div>' + '<div class="text-[11px] text-slate-500 mb-2 truncate" title="' + esc(skills) + '" style="min-height:16px">' + esc(skills) + '</div>' + '<div class="grid ' + gearCols + ' gap-2 mt-auto pt-3">' + gear + widgetTile + '</div>' + '</div>';
 			}
 
 			function heroesBlock(p) {
 				const hs = p.heroes || [];
-				return hs.length ? sec('Heroes & hero gear', '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + hs.map(heroHTML).join('') + '</div>') : '';
+				return hs.length ? sec('Heroes & hero gear', '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + hs.map(h => heroHTML(h, p)).join('') + '</div>') : '';
 			}
 
 			function govHTML(g) {
@@ -1623,9 +1760,7 @@
 			function detailBody(p) {
 				return chipsBlock(p) + coreBlock(p) + leadBlock(p) + troopsBlock(p) + heroesBlock(p) + govBlock(p) + derivedBlock(p) + boardsBlock(p) + powerBlock(p) + specBlock(p) + marchBlock(p) + champBlock(p) + islandBlock(p) + compBlock(p) + linkedBlock(p) + worldBlock(p) + identityBlock(p) + loadoutBlock(p);
 			}
-			/* ------------------------------------------------------------------ */
-			/* Drawer                                                             */
-			/* ------------------------------------------------------------------ */
+
 			function openPlayer(fid) {
 				const p = byFid(fid);
 				if (!p) return;
@@ -1641,9 +1776,6 @@
 			function closeDrawer() {
 				$('#overlay').classList.remove('active');
 			}
-			/* ------------------------------------------------------------------ */
-			/* Wire-up                                                            */
-			/* ------------------------------------------------------------------ */
 			document.addEventListener('click', function(e) {
 				const closeBtn = e.target.closest('#closeDrawer');
 				if (closeBtn) return closeDrawer();
@@ -1692,7 +1824,6 @@
 					renderCatToggles();
 					compute();
 					renderTable();
-					renderLeaders();
 				});
 				const csv = $('#csv');
 				if (csv) csv.addEventListener('click', exportCSV);
@@ -1719,8 +1850,21 @@
 				a.download = 'alliance.csv';
 				a.click();
 			}
+			async function loadNames() {
+				try {
+					const r = await fetch('names.json', {
+						cache: 'no-store'
+					});
+					if (!r.ok) return;
+					const j = await r.json();
+					if (j && j.hero) NAMES.hero = j.hero;
+				} catch (e) {
+					/* keep empty map — heroName() will fall back to player.heroes[].name */
+				}
+			}
 			async function load() {
 				$('#loader').classList.remove('hidden');
+				await loadNames();
 				try {
 					const r = await fetch('alliance_full.json', {
 						cache: 'no-store'
@@ -1743,7 +1887,6 @@
 				compute();
 				renderCatToggles();
 				renderTable();
-				renderLeaders();
 				renderStats();
 				wireToggles();
 				$('#foot').innerHTML = 'Scraped ' + (D.scraped_players || P.length) + ' players · images under <code>images/</code> · data from <code>alliance_full.json</code>';
