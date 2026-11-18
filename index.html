@@ -3,8 +3,9 @@
 
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<title>Alliance · Data Viewer</title>
+		<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ctext y=%2250%22 font-size=%2250%22%3E%E2%9A%94%EF%B8%8F%3C/text%3E%3C/svg%3E">
 		<script src="https://cdn.tailwindcss.com"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 		<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,25 +14,25 @@
 				theme: {
 					extend: {
 						fontFamily: {
-							sans: ['Poppins', 'system-ui', 'sans-serif']
+							sans: ["Poppins", "system-ui", "sans-serif"]
 						},
 						colors: {
 							brand: {
-								50: '#eef2ff',
-								100: '#e0e7ff',
-								200: '#c7d2fe',
-								300: '#a5b4fc',
-								400: '#818cf8',
-								500: '#6366f1',
-								600: '#4f46e5',
-								700: '#4338ca',
-								800: '#3730a3',
-								900: '#312e81'
+								50: "#eef2ff",
+								100: "#e0e7ff",
+								200: "#c7d2fe",
+								300: "#a5b4fc",
+								400: "#818cf8",
+								500: "#6366f1",
+								600: "#4f46e5",
+								700: "#4338ca",
+								800: "#3730a3",
+								900: "#312e81"
 							}
 						}
 					}
 				}
-			}
+			};
 
 		</script>
 		<style>
@@ -50,860 +51,1573 @@
 				--t-sky: #4b8fd1;
 				--t-green: #7fbf7f;
 				--t-grey: #5f6977;
-				/* enhance +N tier colours */
 				--plus-grey: #acacac;
 				--plus-green: #5ed387;
 				--plus-sky: #64bceb;
 				--plus-purple: #c792ff;
 				--plus-mango: #ffe062;
-				--plus-red: #ff6a6a;
+				--plus-red: #ff6a6a
 			}
 
-			html,
-			body {
-				height: 100%;
+			body,
+			html {
+				height: 100%
 			}
 
 			body {
-				font-family: 'Poppins', sans-serif;
 				background: #f1f5f9;
 				color: #1f2937;
+				font-family: Poppins, sans-serif
 			}
 
 			::-webkit-scrollbar {
-				width: 8px;
 				height: 8px;
+				width: 8px
 			}
 
 			::-webkit-scrollbar-track {
-				background: #f1f5f9;
+				background: #f1f5f9
 			}
 
 			::-webkit-scrollbar-thumb {
 				background: #c7d2fe;
-				border-radius: 4px;
+				border-radius: 4px
 			}
 
 			::-webkit-scrollbar-thumb:hover {
-				background: #a5b4fc;
+				background: #a5b4fc
 			}
 
-			/* ---------- CSS Grid Table ---------- */
 			.grid-table {
 				display: flex;
-				flex-direction: column;
-				width: 100%;
+				flex-direction: column
 			}
 
 			.grid-row {
-				display: grid;
-				grid-template-columns:
-					75px 300px 112px 113px 200px 375px 275px;
 				align-items: center;
 				border-bottom: 1px solid #e5e7eb;
-				transition: background 0.1s;
+				display: grid;
+				grid-template-columns: 75px 300px 112px 113px 200px 375px 275px;
 				min-height: 92px;
+				transition: background .1s
 			}
 
 			.grid-row:not(.grid-header):hover {
 				background: #f9fafb;
-				cursor: pointer;
+				cursor: pointer
 			}
 
 			.grid-row.is-transfer {
-				background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, rgba(239, 68, 68, 0.04) 100%);
+				background: linear-gradient(90deg, rgba(245, 158, 11, .06), rgba(239, 68, 68, .04))
 			}
 
 			.grid-row.is-transfer:not(.grid-header):hover {
-				background: linear-gradient(90deg, rgba(245, 158, 11, 0.12) 0%, rgba(239, 68, 68, 0.08) 100%);
+				background: linear-gradient(90deg, rgba(245, 158, 11, .12), rgba(239, 68, 68, .08))
 			}
 
 			.grid-header {
 				background: #f8fafc;
-				font-weight: 600;
+				border-bottom: 2px solid #e5e7eb;
 				color: #6b7280;
+				cursor: pointer;
 				font-size: 11px;
-				text-transform: uppercase;
-				letter-spacing: 0.04em;
+				font-weight: 600;
+				letter-spacing: .04em;
+				min-height: 44px;
 				position: sticky;
 				text-align: center;
+				text-transform: uppercase;
 				top: 0;
-				z-index: 10;
-				border-bottom: 2px solid #e5e7eb;
-				cursor: pointer;
 				user-select: none;
-				min-height: 44px;
+				z-index: 10
 			}
 
 			.grid-cell {
-				padding: 8px 12px;
 				font-size: 13px;
-				white-space: nowrap;
-				overflow: visible;
 				font-variant-numeric: tabular-nums;
-				text-align: center;
 				line-height: 1.35;
+				overflow: visible;
+				text-align: center;
+				white-space: nowrap
 			}
 
 			.grid-cell.pl {
-				text-align: left;
 				overflow: hidden;
+				text-align: left
 			}
 
 			.grid-cell.rank {
-				text-align: center;
 				font-size: 14px;
+				text-align: center
 			}
 
 			.cell-main {
-				display: inline-flex;
 				align-items: center;
-				justify-content: flex-end;
-				gap: 6px;
+				display: inline-flex;
 				flex-wrap: nowrap;
+				gap: 6px;
+				justify-content: flex-end
 			}
 
 			.cell-val {
-				font-weight: 600;
 				color: #111827;
+				font-weight: 600
 			}
 
 			.troop-cell {
-				display: inline-flex;
-				align-items: center;
-				justify-content: flex-end;
-				gap: 6px;
 				flex-wrap: nowrap;
+				gap: 6px;
+				justify-content: flex-end
+			}
+
+			.troop-cell,
+			.troop-pill {
+				align-items: center;
+				display: inline-flex
 			}
 
 			.troop-pill {
-				display: inline-flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				gap: 1px;
 				background: #f1f5f9;
 				border: 1px solid #e2e8f0;
 				border-radius: 8px;
-				padding: 3px 6px;
-				min-width: 42px;
+				flex-direction: column;
+				gap: 1px;
+				justify-content: center;
 				line-height: 1.15;
-				position: relative;
+				min-width: 42px;
 				overflow: hidden;
+				padding: 3px 6px;
+				position: relative
 			}
 
 			.troop-pill img {
-				width: 16px;
-				height: 16px;
 				border-radius: 4px;
-				margin-bottom: 1px;
+				margin-bottom: 1px
 			}
 
 			.troop-pill .tt {
-				font-size: 11px;
-				font-weight: 700;
 				color: #0f172a;
+				font-size: 11px;
+				font-weight: 700
 			}
 
 			.troop-pill .tg {
+				color: #64748b;
 				font-size: 8px;
 				font-weight: 600;
-				color: #64748b;
-				letter-spacing: 0.02em;
+				letter-spacing: .02em
 			}
 
-			/* --- Lead Heroes Row --- */
 			.lead-row {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 6px;
-				margin-top: 4px;
+				margin-top: 4px
 			}
 
 			.lead-chip {
-				display: inline-flex;
 				align-items: center;
-				gap: 4px;
-				font-size: 10px;
-				color: #64748b;
 				background: #f1f5f9;
-				padding: 2px 6px 2px 2px;
-				border-radius: 999px;
-				white-space: nowrap;
-				line-height: 1.2;
 				border: 1px solid #e2e8f0;
+				border-radius: 999px;
+				color: #64748b;
+				display: inline-flex;
+				font-size: 10px;
+				gap: 4px;
+				line-height: 1.2;
+				padding: 2px 6px 2px 2px;
 				position: relative;
+				white-space: nowrap
 			}
 
 			.lead-chip img {
-				width: 18px;
-				height: 18px;
-				border-radius: 50%;
-				object-fit: cover;
 				background: #e2e8f0;
-				flex: none;
 				border: 1px solid #fff;
-				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+				border-radius: 50%;
+				box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+				flex: none;
+				object-fit: cover
 			}
 
 			.lead-widget {
-				display: inline-flex;
 				align-items: center;
-				gap: 3px;
-				font-size: 9.5px;
-				font-weight: 700;
-				color: #4338ca;
 				background: #eef2ff;
 				border: 1px solid #c7d2fe;
 				border-radius: 999px;
-				padding: 1px 6px;
-				line-height: 1.3;
+				color: #4338ca;
+				display: inline-flex;
+				font-size: 9.5px;
 				font-variant-numeric: tabular-nums;
+				font-weight: 700;
+				gap: 3px;
+				line-height: 1.3;
+				padding: 1px 6px
 			}
 
 			.lead-widget img {
-				width: 14px;
-				height: 14px;
-				border-radius: 3px;
-				object-fit: contain;
 				background: transparent;
 				border: none;
+				border-radius: 3px;
 				box-shadow: none;
+				object-fit: contain
 			}
 
-			/* ---------- Governor gear / charm icon grids ---------- */
 			.gear-icon-grid {
-				display: grid;
-				grid-template-columns: repeat(6, 42px);
-				gap: 12px;
-				justify-content: flex-end;
 				align-items: flex-end;
+				display: grid;
+				gap: 12px;
+				grid-template-columns: repeat(6, 42px);
+				justify-content: flex-end
 			}
 
 			.gear-tile {
+				align-items: center;
 				display: flex;
 				flex-direction: column;
-				align-items: center;
-				gap: 2px;
-				width: 42px;
+				gap: 2px
 			}
 
 			.gear-tile .gear-frame {
-				width: 42px;
-				height: 42px;
-				border-radius: 8px;
-				padding: 3px;
-				display: flex;
 				align-items: center;
-				justify-content: center;
+				border-radius: 8px;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
 				box-sizing: border-box;
-				position: relative;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+				display: flex;
+				justify-content: center;
 				overflow: hidden;
+				padding: 3px;
+				position: relative
 			}
 
 			.gear-tile .gear-frame img {
-				width: 100%;
-				height: 100%;
-				border-radius: 5px;
-				object-fit: cover;
-				display: block;
 				background: transparent;
+				border-radius: 5px;
+				display: block;
+				height: 100%;
+				object-fit: cover;
+				width: 100%
 			}
 
 			.gear-tile .stars {
-				font-size: 10px;
-				line-height: 1;
 				color: #f59e0b;
-				letter-spacing: -0.2px;
-				height: 10px;
+				font-size: 10px;
 				font-weight: 800;
-				text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+				height: 10px;
+				letter-spacing: -.2px;
+				line-height: 1;
+				text-shadow: 0 1px 1px hsla(0, 0%, 100%, .8)
 			}
 
 			.gear-tile .tier {
+				color: #475569;
 				font-size: 9px;
 				font-weight: 700;
-				color: #475569;
-				line-height: 1;
+				line-height: 1
 			}
 
 			.q-legendary {
-				background: var(--q-legendary);
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: var(--q-legendary)
+			}
+
+			.q-legendary,
+			.q-mythic {
+				border: 1px solid rgba(0, 0, 0, .3)
 			}
 
 			.q-mythic {
-				background: var(--q-mythic);
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: var(--q-mythic)
 			}
 
 			.q-epic {
-				background: var(--q-epic);
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: var(--q-epic)
+			}
+
+			.q-epic,
+			.q-rare {
+				border: 1px solid rgba(0, 0, 0, .3)
 			}
 
 			.q-rare {
-				background: var(--q-rare);
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: var(--q-rare)
 			}
 
 			.q-uncommon {
-				background: var(--q-uncommon);
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: var(--q-uncommon)
+			}
+
+			.q-uncommon,
+			.q-unknown {
+				border: 1px solid rgba(0, 0, 0, .3)
 			}
 
 			.q-unknown {
-				background: #94a3b8;
-				border: 1px solid rgba(0, 0, 0, 0.3);
+				background: #94a3b8
 			}
 
 			.charm-icon-grid {
+				align-items: center;
 				display: grid;
+				gap: 10px 14px;
 				grid-template-columns: repeat(3, auto);
 				grid-template-rows: repeat(2, auto);
-				gap: 10px 14px;
-				justify-content: flex-end;
-				align-items: center;
+				justify-content: flex-end
 			}
 
 			.charm-group {
+				align-items: flex-start;
 				display: inline-flex;
 				gap: 6px;
-				align-items: flex-start;
-				justify-content: center;
+				justify-content: center
 			}
 
 			.charm-item {
+				align-items: center;
 				display: inline-flex;
 				flex-direction: column;
-				align-items: center;
 				gap: 2px;
-				width: 26px;
-				position: relative;
+				position: relative
 			}
 
 			.charm-item img {
-				width: 26px;
-				height: 26px;
 				border-radius: 4px;
-				object-fit: contain;
 				display: block;
-				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+				filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .1));
+				object-fit: contain
 			}
 
 			.charm-item .lv {
-				font-size: 11px;
-				font-weight: 700;
 				color: #475569;
-				line-height: 1;
+				font-size: 11px;
 				font-variant-numeric: tabular-nums;
+				font-weight: 700;
+				line-height: 1
 			}
 
 			.av {
-				position: relative;
-				width: 36px;
-				height: 36px;
-				border-radius: 50%;
-				background: #e5e7eb;
-				color: #6b7280;
-				font-weight: 700;
-				font-size: 14px;
-				display: inline-flex;
 				align-items: center;
+				background: #e5e7eb;
+				border: 2px solid #fff;
+				border-radius: 50%;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+				color: #6b7280;
+				display: inline-flex;
+				flex: none;
+				font-size: 14px;
+				font-weight: 700;
+				height: 36px;
 				justify-content: center;
 				overflow: hidden;
-				flex: none;
-				border: 2px solid #fff;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+				position: relative;
+				width: 36px
 			}
 
 			.av img {
-				position: absolute;
-				inset: 0;
-				width: 100%;
 				height: 100%;
+				inset: 0;
 				object-fit: cover;
+				position: absolute;
+				width: 100%
 			}
 
 			.av.big {
-				width: 76px;
-				height: 76px;
-				font-size: 26px;
 				border-width: 3px;
+				font-size: 26px;
+				height: 76px;
+				width: 76px
 			}
 
 			.rk {
-				display: inline-block;
-				font-size: 10px;
-				padding: 1px 6px;
-				border-radius: 999px;
 				background: #e2e8f0;
+				border-radius: 999px;
 				color: #475569;
-				font-weight: 700;
-				vertical-align: middle;
-				font-variant-numeric: tabular-nums;
+				display: inline-block;
 				flex: none;
+				font-size: 10px;
+				font-variant-numeric: tabular-nums;
+				font-weight: 700;
+				padding: 1px 6px;
+				vertical-align: middle
 			}
 
 			.rk.r1 {
 				background: var(--gold);
-				color: #1a1400;
+				color: #1a1400
 			}
 
 			.rk.r2 {
 				background: var(--silver);
-				color: #1a1f26;
+				color: #1a1f26
 			}
 
 			.rk.r3 {
 				background: var(--bronze);
-				color: #1a0f04;
+				color: #1a0f04
 			}
 
 			.rk.top {
 				background: #d1fae5;
-				color: #065f46;
+				color: #065f46
 			}
 
 			.gi {
-				width: 100%;
-				max-width: 56px;
 				aspect-ratio: 1;
-				border-radius: 8px;
 				background: #94a3b8;
 				border: 2.5px solid #94a3b8;
+				border-radius: 8px;
+				box-sizing: border-box;
 				display: block;
 				margin: 0 auto;
+				max-width: 56px;
 				object-fit: cover;
-				box-sizing: border-box;
+				width: 100%
 			}
 
 			.gi.t5r {
 				background: var(--t-red);
-				border-color: var(--t-red);
+				border-color: var(--t-red)
 			}
 
 			.gi.t5 {
 				background: var(--t-gold);
-				border-color: var(--t-gold);
+				border-color: var(--t-gold)
 			}
 
 			.gi.t4 {
 				background: var(--t-violet);
-				border-color: var(--t-violet);
+				border-color: var(--t-violet)
 			}
 
 			.gi.t3 {
 				background: var(--t-sky);
-				border-color: var(--t-sky);
+				border-color: var(--t-sky)
 			}
 
 			.gi.t2 {
 				background: var(--t-green);
-				border-color: var(--t-green);
+				border-color: var(--t-green)
 			}
 
 			.gi.t1 {
 				background: var(--t-grey);
-				border-color: var(--t-grey);
+				border-color: var(--t-grey)
 			}
 
-			/* ---------- NEW hero gear overlays ---------- */
-			/* Forgehammer level badge — bottom right */
 			.gear-forge-badge {
-				position: absolute;
-				bottom: 2px;
-				right: 2px;
-				z-index: 5;
-				display: inline-flex;
 				align-items: center;
-				gap: 2px;
-				background: rgba(15, 23, 42, 0.88);
+				background: rgba(15, 23, 42, .88);
+				border-radius: 5px;
+				bottom: 2px;
 				color: #f8fafc;
+				display: inline-flex;
 				font-size: 9px;
+				font-variant-numeric: tabular-nums;
 				font-weight: 700;
+				gap: 2px;
 				line-height: 1;
 				padding: 1px 4px 1px 2px;
-				border-radius: 5px;
 				pointer-events: none;
-				font-variant-numeric: tabular-nums;
+				position: absolute;
+				right: 2px;
+				z-index: 5
 			}
 
 			.gear-forge-badge img {
-				width: 11px;
-				height: 11px;
-				object-fit: contain;
 				display: block;
 				flex: none;
+				object-fit: contain
 			}
 
-			/* +N enhance oval — top right */
 			.gear-plus-badge {
-				position: absolute;
-				top: -6px;
-				right: -6px;
-				z-index: 6;
-				display: inline-flex;
 				align-items: center;
-				justify-content: center;
-				min-width: 30px;
-				height: 18px;
-				padding: 0 7px;
+				border: 1px solid rgba(0, 0, 0, .15);
 				border-radius: 999px;
-				font-size: 10.5px;
-				font-weight: 800;
-				line-height: 1;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
 				color: #111827;
-				border: 1px solid rgba(0, 0, 0, 0.15);
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+				display: inline-flex;
+				font-size: 10.5px;
 				font-variant-numeric: tabular-nums;
+				font-weight: 800;
+				height: 18px;
+				justify-content: center;
+				line-height: 1;
+				min-width: 30px;
+				padding: 0 7px;
+				position: absolute;
+				right: -6px;
+				top: -6px;
 				white-space: nowrap;
+				z-index: 6
 			}
 
 			.gear-plus-badge.p-grey {
-				background: var(--plus-grey);
+				background: var(--plus-grey)
 			}
 
 			.gear-plus-badge.p-green {
-				background: var(--plus-green);
+				background: var(--plus-green)
 			}
 
 			.gear-plus-badge.p-sky {
-				background: var(--plus-sky);
+				background: var(--plus-sky)
 			}
 
 			.gear-plus-badge.p-purple {
-				background: var(--plus-purple);
+				background: var(--plus-purple)
 			}
 
 			.gear-plus-badge.p-mango {
-				background: var(--plus-mango);
+				background: var(--plus-mango)
 			}
 
 			.gear-plus-badge.p-red {
-				background: var(--plus-red);
+				background: var(--plus-red)
 			}
 
-			/* Widget tile (gold) inside hero modal card */
 			.widget-tile {
-				display: flex;
 				flex-direction: column;
+				gap: 2px
+			}
+
+			.widget-frame,
+			.widget-tile {
 				align-items: center;
-				gap: 2px;
+				display: flex
 			}
 
 			.widget-frame {
-				width: 56px;
-				height: 56px;
-				border-radius: 8px;
-				padding: 3px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				box-sizing: border-box;
-				position: relative;
 				background: var(--gold);
 				border: 2px solid #b8912a;
-				box-shadow: 0 1px 4px rgba(184, 145, 42, 0.35);
+				border-radius: 8px;
+				box-shadow: 0 1px 4px rgba(184, 145, 42, .35);
+				box-sizing: border-box;
+				justify-content: center;
 				overflow: visible;
+				padding: 3px;
+				position: relative
 			}
 
 			.widget-frame img {
-				width: 100%;
-				height: 100%;
-				border-radius: 5px;
-				object-fit: contain;
-				display: block;
 				background: transparent;
+				border-radius: 5px;
+				display: block;
+				height: 100%;
+				object-fit: contain;
+				width: 100%
 			}
 
-			/* widget +N level — top right */
 			.widget-frame .wlv {
-				position: absolute;
-				top: -6px;
-				right: -6px;
-				background: rgba(15, 23, 42, 0.92);
+				background: rgba(15, 23, 42, .92);
+				border: 1px solid #b8912a;
+				border-radius: 999px;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
 				color: #fde68a;
 				font-size: 10.5px;
-				font-weight: 800;
-				padding: 1px 6px;
-				border-radius: 999px;
-				border: 1px solid #b8912a;
-				line-height: 1.3;
 				font-variant-numeric: tabular-nums;
-				z-index: 3;
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+				font-weight: 800;
+				line-height: 1.3;
+				padding: 1px 6px;
+				position: absolute;
+				right: -6px;
+				top: -6px;
+				z-index: 3
 			}
 
 			.widget-label {
+				color: #8a6a1a;
 				font-size: 9px;
 				font-weight: 700;
-				color: #8a6a1a;
-				text-transform: uppercase;
-				letter-spacing: 0.04em;
+				letter-spacing: .04em;
 				line-height: 1;
+				text-transform: uppercase
 			}
 
 			.modal-gear-wrapper {
-				position: relative;
-				width: 64px;
-				height: 64px;
+				align-items: center;
 				border-radius: 10px;
-				padding: 4px;
 				box-sizing: border-box;
 				display: flex;
-				align-items: center;
+				height: 64px;
 				justify-content: center;
 				margin-bottom: 14px;
-				z-index: 1;
+				padding: 4px;
+				position: relative;
+				width: 64px;
+				z-index: 1
 			}
 
 			.modal-gear-wrapper .gi2 {
-				width: 100%;
-				height: 100%;
-				border-radius: 7px;
 				background: transparent;
-				position: relative;
-				z-index: 2;
-				object-fit: cover;
+				border-radius: 7px;
 				display: block;
+				height: 100%;
+				object-fit: cover;
+				position: relative;
+				width: 100%;
+				z-index: 2
 			}
 
 			.modal-gear-wrapper .st {
-				position: absolute;
 				bottom: -18px;
-				left: 0;
-				right: 0;
-				text-align: center;
 				color: #f59e0b;
 				font-size: 15px;
+				font-weight: 700;
+				left: 0;
 				letter-spacing: 0;
 				line-height: 1;
-				z-index: 3;
-				font-weight: 700;
 				pointer-events: none;
+				position: absolute;
+				right: 0;
+				text-align: center;
+				z-index: 3
 			}
 
 			.kv>div {
-				display: flex;
-				justify-content: space-between;
-				gap: 12px;
-				padding: 7px 0;
 				border-bottom: 1px solid #eef2f6;
+				display: flex;
 				font-size: 13.5px;
+				gap: 12px;
+				justify-content: space-between;
+				padding: 7px 0
 			}
 
 			.kv>div>span:first-child {
-				color: #6b7280;
+				color: #6b7280
 			}
 
 			.kv>div>span:last-child {
 				color: #111827;
-				font-weight: 500;
 				font-variant-numeric: tabular-nums;
-				text-align: right;
+				font-weight: 500;
 				max-width: 55%;
 				overflow: hidden;
+				text-align: right;
 				text-overflow: ellipsis;
-				white-space: nowrap;
+				white-space: nowrap
 			}
 
 			.chip {
+				align-items: center;
 				background: #fff;
 				border: 1px solid #e5e7eb;
 				border-radius: 999px;
-				padding: 5px 12px;
-				font-size: 12.5px;
 				color: #6b7280;
 				display: inline-flex;
-				align-items: center;
+				font-size: 12.5px;
 				gap: 6px;
+				padding: 5px 12px
 			}
 
 			.chip b {
 				color: #111827;
-				font-weight: 600;
+				font-weight: 600
 			}
 
 			.player-link {
+				border-bottom: 1px solid rgba(79, 70, 229, .35);
 				color: #4f46e5;
-				font-weight: 600;
-				text-decoration: none;
-				border-bottom: 1px solid rgba(79, 70, 229, 0.35);
 				cursor: pointer;
+				font-weight: 600;
+				text-decoration: none
 			}
 
 			.player-link:hover {
-				color: #3730a3;
 				border-bottom-color: #3730a3;
+				color: #3730a3
 			}
 
 			.transfer-badge {
-				display: inline-block;
+				background: linear-gradient(135deg, #f59e0b, #ef4444);
+				border-radius: 999px;
+				box-shadow: 0 1px 3px rgba(239, 68, 68, .35);
+				color: #fff;
+				font-family: Poppins, system-ui, sans-serif;
 				font-size: 9px;
 				font-weight: 700;
-				text-transform: uppercase;
 				letter-spacing: .05em;
-				padding: 1.5px 7px;
-				border-radius: 999px;
-				background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
-				color: #fff;
-				margin-left: 6px;
-				vertical-align: middle;
-				box-shadow: 0 1px 3px rgba(239, 68, 68, .35);
-				white-space: nowrap;
-				font-family: 'Poppins', system-ui, sans-serif;
 				line-height: 1.25;
+				margin-left: 6px;
+				padding: 1.5px 7px;
+				text-transform: uppercase;
+				white-space: nowrap
+			}
+
+			.transfer-badge,
+			.transfer-badge .tb-dot {
+				display: inline-block;
+				vertical-align: middle
 			}
 
 			.transfer-badge .tb-dot {
-				display: inline-block;
-				width: 5px;
-				height: 5px;
-				border-radius: 50%;
 				background: #fff;
+				border-radius: 50%;
+				box-shadow: 0 0 3px hsla(0, 0%, 100%, .9);
+				height: 5px;
 				margin-right: 3px;
-				vertical-align: middle;
-				box-shadow: 0 0 3px rgba(255, 255, 255, .9);
+				width: 5px
 			}
 
 			.modal-overlay {
-				position: fixed;
-				inset: 0;
+				align-items: center;
 				background: rgba(15, 23, 42, .55);
 				display: flex;
-				align-items: center;
+				inset: 0;
 				justify-content: center;
-				z-index: 1000;
 				opacity: 0;
-				visibility: hidden;
-				transition: opacity .2s, visibility .2s;
 				padding: 20px;
+				position: fixed;
+				transition: opacity .2s, visibility .2s;
+				visibility: hidden;
+				z-index: 1000
 			}
 
 			.modal-overlay.active {
 				opacity: 1;
-				visibility: visible;
+				visibility: visible
 			}
 
 			.modal-card {
 				background: #fff;
 				border-radius: 18px;
-				width: 100%;
-				max-width: 1100px;
-				max-height: 92vh;
-				overflow-y: auto;
 				box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .3);
+				max-height: 92vh;
+				max-width: 1100px;
+				overflow-y: auto;
 				transform: translateY(20px);
-				transition: transform .2s;
+				transition: transform .2s
 			}
 
 			.modal-overlay.active .modal-card {
-				transform: translateY(0);
+				transform: translateY(0)
 			}
 
 			.chip-toggle {
-				display: inline-flex;
 				align-items: center;
-				gap: 8px;
 				background: #fff;
 				border: 1.5px solid #e5e7eb;
 				border-radius: 999px;
-				padding: 5px 14px;
-				font-size: 12.5px;
 				color: #475569;
 				cursor: pointer;
-				user-select: none;
-				transition: all .15s;
+				display: inline-flex;
+				font-size: 12.5px;
 				font-weight: 500;
+				gap: 8px;
+				padding: 5px 14px;
+				transition: all .15s;
+				user-select: none
 			}
 
 			.chip-toggle:hover {
-				border-color: #a5b4fc;
+				border-color: #a5b4fc
 			}
 
 			.chip-toggle.on {
 				background: #eef2ff;
 				border-color: #4f46e5;
-				color: #4338ca;
+				color: #4338ca
 			}
 
 			.chip-toggle.exclude-toggle.on {
-				background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+				background: linear-gradient(135deg, rgba(99, 102, 241, .12), rgba(168, 85, 247, .12));
 				border-color: #6366f1;
-				color: #4338ca;
+				color: #4338ca
 			}
 
 			.chip-toggle .dot {
-				width: 13px;
-				height: 13px;
-				border-radius: 50%;
-				border: 2px solid #94a3b8;
 				background: transparent;
-				position: relative;
+				border: 2px solid #94a3b8;
+				border-radius: 50%;
 				flex: none;
+				height: 13px;
+				position: relative;
+				width: 13px
 			}
 
 			.chip-toggle.on .dot {
-				border-color: #4f46e5;
 				background: #4f46e5;
+				border-color: #4f46e5
 			}
 
 			.chip-toggle.exclude-toggle.on .dot {
-				border-color: #6366f1;
 				background: #6366f1;
+				border-color: #6366f1
 			}
 
-			.chip-toggle.on .dot::after {
-				content: '';
-				position: absolute;
-				inset: 2.5px;
-				border-radius: 50%;
+			.chip-toggle.on .dot:after {
 				background: #fff;
+				border-radius: 50%;
+				content: "";
+				inset: 2.5px;
+				position: absolute
 			}
 
 			.spinner {
-				border: 4px solid #e5e7eb;
-				border-top: 4px solid #4f46e5;
-				border-radius: 50%;
-				width: 48px;
-				height: 48px;
 				animation: spin 1s linear infinite;
+				border: 4px solid #e5e7eb;
+				border-radius: 50%;
+				border-top-color: #4f46e5;
+				height: 48px;
+				width: 48px
 			}
 
 			@keyframes spin {
 				to {
-					transform: rotate(360deg);
+					transform: rotate(1turn)
 				}
 			}
 
 			.sec-h {
-				display: flex;
 				align-items: center;
-				gap: 10px;
-				font-size: 12px;
-				text-transform: uppercase;
-				letter-spacing: .12em;
-				font-weight: 700;
 				color: #64748b;
+				display: flex;
+				font-size: 12px;
+				font-weight: 700;
+				gap: 10px;
+				letter-spacing: .12em;
 				margin-bottom: 14px;
+				text-transform: uppercase
 			}
 
-			.sec-h::before {
-				content: '';
-				width: 4px;
-				height: 16px;
+			.sec-h:before {
 				background: #4f46e5;
 				border-radius: 3px;
+				content: "";
+				height: 16px;
+				width: 4px
 			}
 
 			.sec-h .hint {
-				font-size: 12px;
-				text-transform: none;
-				letter-spacing: 0;
-				font-weight: 400;
 				color: #94a3b8;
+				font-size: 12px;
+				font-weight: 400;
+				letter-spacing: 0;
+				text-transform: none
+			}
+
+			*,
+			:after,
+			:before {
+				box-sizing: border-box
+			}
+
+			html {
+				-webkit-text-size-adjust: 100%;
+				text-size-adjust: 100%
+			}
+
+			body {
+				min-width: 320px;
+				overflow-x: hidden
+			}
+
+			#page {
+				width: 100%
+			}
+
+			#page,
+			#statGrid,
+			#statGrid>* {
+				min-width: 0
+			}
+
+			#statGrid>* {
+				overflow-wrap: anywhere
+			}
+
+			#page>.bg-white {
+				min-width: 0
+			}
+
+			.member-table-scroll {
+				max-width: 100%;
+				overflow-x: auto !important;
+				overflow-y: auto
+			}
+
+			.grid-row,
+			.grid-table,
+			.member-table-scroll {
+				min-width: 0;
+				width: 100%
+			}
+
+			.grid-row {
+				grid-template-columns: 75px 300px 112px 113px 200px 375px 275px
+			}
+
+			@media (min-width:761px) {
+				.grid-table {
+					min-width: 1450px
+				}
+			}
+
+			.grid-row>.grid-cell {
+				min-width: 0;
+				overflow-wrap: anywhere;
+				white-space: normal
+			}
+
+			.grid-cell {
+				padding: 8px 6px
+			}
+
+			.cell-main,
+			.troop-cell {
+				flex-wrap: wrap;
+				justify-content: center
+			}
+
+			.troop-cell {
+				gap: 3px
+			}
+
+			.troop-pill {
+				min-width: 36px;
+				padding: 3px 4px
+			}
+
+			.av,
+			.av img,
+			.charm-item,
+			.charm-item img,
+			.gear-forge-badge img,
+			.gear-tile,
+			.gear-tile .gear-frame,
+			.gear-tile .gear-frame img,
+			.gi,
+			.gi2,
+			.lead-chip img,
+			.lead-widget img,
+			.troop-pill img,
+			.widget-frame,
+			.widget-frame img {
+				flex-shrink: 0
+			}
+
+			.av {
+				flex: 0 0 36px
+			}
+
+			.av.big {
+				flex: 0 0 76px
+			}
+
+			.troop-pill img {
+				height: 16px;
+				width: 16px
+			}
+
+			.lead-chip img {
+				height: 18px;
+				width: 18px
+			}
+
+			.lead-widget img {
+				height: 14px;
+				width: 14px
+			}
+
+			.gear-tile {
+				width: 42px
+			}
+
+			.gear-tile .gear-frame {
+				height: 42px;
+				width: 42px
+			}
+
+			.charm-item {
+				width: 26px
+			}
+
+			.charm-item img {
+				height: 26px;
+				width: 26px
+			}
+
+			.gear-forge-badge img {
+				height: 11px;
+				width: 11px
+			}
+
+			.widget-frame {
+				height: 56px;
+				width: 56px
+			}
+
+			#drawer .gi,
+			#drawer img {
+				max-width: none
+			}
+
+			#drawer .gi,
+			#drawer .gi2,
+			#drawer .w-14.h-14 {
+				flex: 0 0 56px;
+				height: 56px;
+				width: 56px
+			}
+
+			#drawer .w-16.h-16 {
+				flex: 0 0 64px;
+				height: 64px;
+				width: 64px
+			}
+
+			#drawer .w-11.h-11 {
+				flex: 0 0 44px;
+				height: 44px;
+				width: 44px
+			}
+
+			#drawer .w-12.h-12 {
+				flex: 0 0 48px;
+				height: 48px;
+				width: 48px
+			}
+
+			.modal-card {
+				min-width: 0;
+				width: 100%
+			}
+
+			#drawer .flex,
+			#drawer .grid,
+			#drawer>.px-6.py-6 {
+				min-width: 0
+			}
+
+			#drawer .overflow-auto {
+				max-width: 100%;
+				overflow-x: hidden !important
+			}
+
+			#drawer .gear-icon-grid {
+				grid-template-columns: repeat(6, 42px)
+			}
+
+			#drawer .charm-icon-grid {
+				grid-template-columns: repeat(3, auto)
+			}
+
+			@media (max-width:1100px) {
+				#statGrid {
+					grid-template-columns: repeat(3, minmax(0, 1fr)) !important
+				}
+
+				.modal-overlay {
+					padding: 16px
+				}
+
+				.modal-card {
+					max-height: 94vh;
+					max-height: 94dvh
+				}
+			}
+
+			.mobile-gov-content {
+				display: none
+			}
+
+			.desktop-gov-content {
+				display: inline-flex
+			}
+
+			.mobile-gov-grid {
+				align-items: start;
+				display: grid;
+				gap: 12px 6px;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				width: 100%
+			}
+
+			.mobile-gear-group {
+				align-items: center;
+				background: #f8fafc;
+				border: 1px solid #e2e8f0;
+				border-radius: 10px;
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				min-width: 0;
+				padding: 8px 2px
+			}
+
+			.mobile-gear-charms {
+				align-items: flex-start;
+				display: flex;
+				gap: 3px;
+				justify-content: center;
+				width: 100%
+			}
+
+			.mobile-gear-charms .charm-item {
+				flex: 0 0 26px;
+				width: 26px
+			}
+
+			.mobile-gear-charms .charm-item img {
+				height: 26px;
+				width: 26px
+			}
+
+			@media (max-width:760px) {
+				header>div {
+					flex-wrap: nowrap !important;
+					gap: 10px !important;
+					padding: 12px 14px !important
+				}
+
+				header #brandLogo {
+					flex: 0 0 48px;
+					height: 48px !important;
+					width: 48px !important
+				}
+
+				header>div>.flex-1 {
+					display: none
+				}
+
+				header>div>div:last-child {
+					flex: 0 0 auto;
+					margin-left: auto;
+					white-space: nowrap
+				}
+
+				#page {
+					padding: 12px !important
+				}
+
+				#statGrid {
+					gap: 10px !important;
+					grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+					margin-bottom: 14px !important
+				}
+
+				#statGrid>div {
+					border-radius: 14px !important;
+					min-width: 0;
+					padding: 12px !important
+				}
+
+				#statGrid>div .text-2xl {
+					font-size: 20px !important;
+					overflow-wrap: anywhere
+				}
+
+				#statGrid>div .w-14 {
+					flex: 0 0 42px;
+					height: 42px !important;
+					width: 42px !important
+				}
+
+				#statGrid>div .w-14 i {
+					font-size: 16px !important
+				}
+
+				#page>.bg-white {
+					border-radius: 14px;
+					min-width: 0
+				}
+
+				#page>.bg-white>div:first-child {
+					align-items: stretch;
+					gap: 10px !important;
+					padding: 14px !important
+				}
+
+				#page>.bg-white>div:first-child>.flex-1 {
+					display: none
+				}
+
+				#overallcats {
+					gap: 6px !important;
+					order: 10;
+					width: 100%
+				}
+
+				#overallcats .chip-toggle {
+					max-width: 100%;
+					white-space: normal
+				}
+
+				#excludeTransfers {
+					flex: 1 1 100%;
+					justify-content: center
+				}
+
+				#page .relative:has(#q) {
+					flex: 1 1 100%;
+					min-width: 0;
+					width: 100%
+				}
+
+				#page input#q {
+					min-width: 0;
+					width: 100%
+				}
+
+				#csv {
+					flex: 1 1 100%;
+					justify-content: center
+				}
+
+				.member-table-scroll {
+					max-height: none !important;
+					overflow: visible !important;
+					width: 100%
+				}
+
+				.grid-row.grid-header {
+					display: none
+				}
+
+				.grid-row:not(.grid-header) {
+					align-items: start;
+					background: #fff;
+					border: 1px solid #e2e8f0;
+					border-radius: 14px;
+					box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+					display: grid;
+					gap: 0;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					margin: 0 0 12px;
+					min-height: 0;
+					min-width: 0;
+					padding: 10px;
+					position: relative;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell {
+					min-width: 0;
+					overflow: visible;
+					overflow-wrap: anywhere;
+					padding: 9px 3px;
+					white-space: normal
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell.rank {
+					left: 10px;
+					padding: 8px 2px;
+					position: absolute;
+					top: 15px;
+					width: 42px;
+					z-index: 1
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell.pl {
+					border-bottom: 1px solid #eef2f7;
+					grid-column: 1/-1;
+					grid-row: 1;
+					min-height: 60px;
+					overflow: visible;
+					padding: 5px 4px 10px 46px
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell.pl>.flex {
+					gap: 8px;
+					min-width: 0
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell.pl .lead-row {
+					gap: 4px
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(3),
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(4),
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(5) {
+					align-items: center;
+					border-top: 1px solid #f1f5f9;
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+					grid-column: auto;
+					grid-row: 2;
+					justify-content: flex-start;
+					min-height: 78px;
+					min-width: 0;
+					text-align: center
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(n+3):before {
+					color: #64748b;
+					content: attr(data-label);
+					display: block;
+					font-size: 9px;
+					font-weight: 700;
+					letter-spacing: .04em;
+					line-height: 1.3;
+					overflow-wrap: anywhere;
+					text-transform: uppercase;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header) .cell-main,
+				.grid-row:not(.grid-header) .troop-cell {
+					align-items: center;
+					display: flex;
+					flex-wrap: wrap;
+					gap: 5px;
+					justify-content: center;
+					min-width: 0;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header) .troop-cell {
+					gap: 4px
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(6) {
+					align-items: stretch;
+					border-top: 1px solid #f1f5f9;
+					display: flex;
+					flex-direction: column;
+					grid-column: 1/-1;
+					grid-row: 3;
+					justify-content: flex-start;
+					min-width: 0;
+					padding: 12px 2px 4px;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(6):before {
+					content: "Governor Gear & Charms";
+					margin-bottom: 10px
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(6) .cell-main {
+					display: block;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header) .desktop-gov-content {
+					display: none
+				}
+
+				.grid-row:not(.grid-header) .mobile-gov-content {
+					display: block;
+					width: 100%
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell:nth-child(7) {
+					display: none !important
+				}
+
+				.mobile-gov-grid {
+					display: grid;
+					gap: 12px 6px;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					width: 100%
+				}
+
+				.mobile-gear-group {
+					align-items: center;
+					background: #f8fafc;
+					border: 1px solid #e2e8f0;
+					border-radius: 10px;
+					display: flex;
+					flex-direction: column;
+					gap: 5px;
+					justify-content: flex-start;
+					min-width: 0;
+					padding: 8px 2px
+				}
+
+				.mobile-gear-charms {
+					align-items: flex-start;
+					display: flex;
+					gap: 3px;
+					justify-content: center;
+					width: 100%
+				}
+
+				.mobile-gear-charms .charm-item {
+					flex: 0 0 26px;
+					width: 26px
+				}
+
+				.mobile-gear-charms .charm-item img {
+					height: 26px;
+					width: 26px
+				}
+
+				.gear-tile {
+					width: 42px
+				}
+
+				.gear-tile .gear-frame {
+					height: 42px;
+					width: 42px
+				}
+
+				.charm-item {
+					width: 26px
+				}
+
+				.charm-item img {
+					height: 26px;
+					width: 26px
+				}
+
+				.charm-icon-grid {
+					gap: 10px 6px;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					justify-content: center;
+					width: 100%
+				}
+
+				.charm-group {
+					flex-wrap: wrap;
+					gap: 4px
+				}
+
+				.modal-overlay {
+					align-items: flex-end;
+					justify-content: center;
+					padding: 0
+				}
+
+				.modal-card {
+					border-radius: 18px 18px 0 0;
+					max-height: 96vh;
+					max-height: 96dvh;
+					max-width: none;
+					padding-bottom: env(safe-area-inset-bottom);
+					width: 100%
+				}
+
+				#drawer>.sticky {
+					border-radius: 18px 18px 0 0;
+					gap: 12px !important;
+					padding: 14px !important
+				}
+
+				#drawer>.sticky h2 {
+					font-size: 20px !important
+				}
+
+				#drawer>.sticky>div:nth-child(2)>div {
+					line-height: 1.45;
+					white-space: normal
+				}
+
+				#drawer>.px-6.py-6 {
+					padding: 14px !important
+				}
+
+				#drawer .grid.grid-cols-1.md\:grid-cols-2,
+				#drawer .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 {
+					grid-template-columns: minmax(0, 1fr) !important
+				}
+
+				#drawer .grid.grid-cols-4,
+				#drawer .grid.grid-cols-5 {
+					align-items: flex-start;
+					display: flex !important;
+					flex-wrap: wrap;
+					gap: 8px;
+					justify-content: flex-start
+				}
+
+				#drawer .gov-gear-card {
+					align-items: flex-start;
+					flex-wrap: wrap
+				}
+
+				#drawer .gov-gear-card .modal-gear-wrapper {
+					flex: 0 0 64px
+				}
+
+				#drawer .gov-gear-card .flex.gap-2.flex-none {
+					flex-wrap: wrap
+				}
+
+				#drawer .sec-h {
+					font-size: 11px;
+					margin-bottom: 10px
+				}
+
+				#drawer table {
+					min-width: 0;
+					table-layout: fixed;
+					width: 100%
+				}
+
+				#drawer td,
+				#drawer th {
+					overflow-wrap: anywhere;
+					padding-left: 6px;
+					padding-right: 6px;
+					white-space: normal
+				}
+
+				#drawer .overflow-auto,
+				#drawer [class*=overflow-x] {
+					overflow-x: hidden !important
+				}
+			}
+
+			@media (max-width:420px) {
+				#page {
+					padding: 8px !important
+				}
+
+				#statGrid {
+					gap: 8px !important
+				}
+
+				#statGrid>div {
+					padding: 10px !important
+				}
+
+				#statGrid>div .text-[\31 1px] {
+					font-size: 9px !important
+				}
+
+				#statGrid>div .text-2xl {
+					font-size: 18px !important
+				}
+
+				#page>.bg-white>div:first-child {
+					padding: 12px !important
+				}
+
+				.chip-toggle {
+					font-size: 11px;
+					padding: 7px 10px
+				}
+
+				#drawer>.px-6.py-6,
+				#drawer>.sticky {
+					padding: 12px !important
+				}
+
+				.grid-row:not(.grid-header) {
+					padding: 8px
+				}
+
+				.grid-row:not(.grid-header)>.grid-cell {
+					padding-left: 3px;
+					padding-right: 3px
+				}
+			}
+
+			@media (max-width:350px) {
+				header #title {
+					font-size: 14px !important
+				}
+
+				header #subtitle {
+					font-size: 10px !important
+				}
+
+				#statGrid>div .w-14 {
+					display: none
+				}
+
+				.gear-icon-grid {
+					gap: 2px
+				}
 			}
 
 		</style>
@@ -912,16 +1626,13 @@
 	<body class="min-h-screen">
 		<header class="bg-white shadow-sm sticky top-0 z-30 border-b border-slate-200">
 			<div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 flex items-center gap-4 flex-wrap">
-				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20"> A</div>
+				<div id="brandLogo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-lg text-white flex-none shadow-lg shadow-indigo-500/20">A</div>
 				<div class="min-w-0">
 					<h1 id="title" class="text-lg sm:text-xl font-bold leading-tight truncate">Alliance</h1>
 					<p class="text-xs text-slate-500 truncate" id="subtitle">Data viewer</p>
 				</div>
 				<div class="flex-1"></div>
-				<div class="flex items-center gap-2 text-xs text-slate-500">
-					<i class="fas fa-users text-slate-400"></i>
-					<span id="memberCount">0 members</span>
-				</div>
+				<div class="flex items-center gap-2 text-xs text-slate-500"><i class="fas fa-users text-slate-400"></i> <span id="memberCount">0 members</span></div>
 			</div>
 		</header>
 		<div id="loader" class="p-8 hidden">
@@ -939,17 +1650,10 @@
 						<p class="text-xs text-slate-500">Click any row to open the full dossier</p>
 					</div>
 					<div class="flex-1"></div>
-					<div class="flex flex-wrap gap-2" id="overallcats"></div>
-					<button id="excludeTransfers" class="chip-toggle exclude-toggle" title="Hide players recently transferred into DEW">
-						<span class="dot"></span> Except new transfers </button>
-					<div class="relative">
-						<input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
-						<i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-					</div>
-					<button id="csv" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition">
-						<i class="fas fa-download"></i> Export CSV </button>
+					<div class="flex flex-wrap gap-2" id="overallcats"></div><button id="excludeTransfers" class="chip-toggle exclude-toggle" title="Hide players recently transferred into DEW"><span class="dot"></span> Except new transfers</button>
+					<div class="relative"><input id="q" type="search" placeholder="Search name…" class="pl-10 pr-4 py-2 rounded-xl border border-slate-200 bg-white text-sm w-full sm:w-64 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"> <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i></div><button id="csv" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-700 text-white text-sm font-medium hover:shadow-lg hover:shadow-indigo-500/30 transition"><i class="fas fa-download"></i> Export CSV</button>
 				</div>
-				<div class="overflow-x-hidden overflow-y-auto max-h-[calc(100vh-340px)]">
+				<div class="member-table-scroll overflow-x-auto overflow-y-auto max-h-[calc(100vh-340px)]" role="region" aria-label="Alliance members table">
 					<div id="tbl" class="grid-table"></div>
 				</div>
 			</div>
@@ -961,42 +1665,42 @@
 			const $ = (sel, root) => (root || document).querySelector(sel);
 
 			function esc(val) {
-				if (val == null) return '';
+				if (val == null) return "";
 				return String(val).replace(/[&<>"']/g, function(ch) {
 					switch (ch) {
-						case '&':
-							return '&amp;';
-						case '<':
-							return '&lt;';
-						case '>':
-							return '&gt;';
+						case "&":
+							return "&amp;";
+						case "<":
+							return "&lt;";
+						case ">":
+							return "&gt;";
 						case '"':
-							return '&quot;';
+							return "&quot;";
 						case "'":
-							return '&#39;';
+							return "&#39;";
 						default:
-							return ch;
+							return ch
 					}
-				});
+				})
 			}
-			const dd = p => (p && p.derived) || {};
-			const fmtM = n => n == null ? '-' : n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
-			const fmtN = n => n == null ? '-' : Number(n).toLocaleString('en-US');
-			const pct = n => (n == null || isNaN(n)) ? '-' : (n > 0 ? '+' : '') + Number(n).toFixed(1) + '%';
-			const img = (src, cls) => src ? '<img src="' + esc(src) + '" class="' + (cls || '') + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
+			const dd = p => p && p.derived || {};
+			const fmtM = n => n == null ? "-" : n >= 1e9 ? (n / 1e9).toFixed(2) + "B" : n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? (n / 1e3).toFixed(1) + "K" : String(n);
+			const fmtN = n => n == null ? "-" : Number(n).toLocaleString("en-US");
+			const pct = n => n == null || isNaN(n) ? "-" : (n > 0 ? "+" : "") + Number(n).toFixed(1) + "%";
+			const img = (src, cls) => src ? '<img src="' + esc(src) + '" class="' + (cls || "") + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' : "";
 
 			function timeAgo(str) {
-				if (!str) return '-';
+				if (!str) return "-";
 				try {
 					const d = new Date(str);
-					const days = Math.floor((Date.now() - d.getTime()) / 86400000);
-					if (days <= 0) return 'today';
-					return days + 'd ago';
+					const days = Math.floor((Date.now() - d.getTime()) / 864e5);
+					if (days <= 0) return "today";
+					return days + "d ago"
 				} catch (e) {
-					return str;
+					return str
 				}
 			}
-			const heroIcon = id => 'images/kingshot/heroes/hero_headpic_' + id + '.png';
+			const heroIcon = id => "images/kingshot/heroes/hero_headpic_" + id + ".png";
 
 			function heroName(id, player) {
 				const key = String(id);
@@ -1004,35 +1708,35 @@
 				if (player && Array.isArray(player.heroes)) {
 					for (let i = 0; i < player.heroes.length; i++) {
 						const h = player.heroes[i];
-						if (String(h.hero_id) === key && h.name) return h.name;
+						if (String(h.hero_id) === key && h.name) return h.name
 					}
 				}
-				return 'Unknown hero';
+				return "Unknown hero"
 			}
 
 			function widgetIcon(id, player) {
 				const name = heroName(id, player);
-				if (!name || name === 'Unknown hero') return null;
-				const slug = name.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+				if (!name || name === "Unknown hero") return null;
+				const slug = name.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
 				if (!slug) return null;
-				return 'images/kingshot/widget/' + slug + '_widget.webp';
+				return "images/kingshot/widget/" + slug + "_widget.webp"
 			}
-			/* Widget level = hero.exclusive.level */
+
 			function widgetLevelFromHero(hero) {
 				if (!hero || !hero.exclusive) return null;
 				const lv = hero.exclusive.level;
 				if (lv == null || isNaN(Number(lv))) return null;
-				return Number(lv);
+				return Number(lv)
 			}
-			/* Enhance +N tier colour */
+
 			function plusTierClass(plus) {
-				if (plus <= 0) return '';
-				if (plus <= 19) return 'p-grey';
-				if (plus <= 39) return 'p-green';
-				if (plus <= 59) return 'p-sky';
-				if (plus <= 79) return 'p-purple';
-				if (plus <= 99) return 'p-mango';
-				return 'p-red';
+				if (plus <= 0) return "";
+				if (plus <= 19) return "p-grey";
+				if (plus <= 39) return "p-green";
+				if (plus <= 59) return "p-sky";
+				if (plus <= 79) return "p-purple";
+				if (plus <= 99) return "p-mango";
+				return "p-red"
 			}
 			let D = {};
 			let NAMES = {
@@ -1040,10 +1744,10 @@
 			};
 			let P = [];
 			const state = {
-				sortKey: 'combat',
+				sortKey: "combat",
 				sortDir: -1,
-				search: '',
-				overall: new Set(),
+				search: "",
+				overall: new Set,
 				excludeTransfers: false
 			};
 			let RK = {},
@@ -1052,11 +1756,11 @@
 			const TRANSFER_NAMES = ["Alcadraz", "Phyenty", "MonkDragz", "⫷ ꌦꇙꊰ05⫸", "ShadowNv", "HAHAO", "whoopty doo", "Lord Fartquaad", "NotyourKen"];
 
 			function normName(str) {
-				return String(str || '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+				return String(str || "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/\s+/g, " ").trim().toLowerCase()
 			}
 
 			function stripTags(str) {
-				return String(str || '').normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/[ᴰᴱᵂᵀᴴᶠ²ᴾ\s·•.&'’]/g, '').toLowerCase();
+				return String(str || "").normalize("NFKC").replace(/[\u200B-\u200D\uFEFF]/g, "").replace(/[ᴰᴱᵂᵀᴴᶠ²ᴾ\s·•.&'’]/g, "").toLowerCase()
 			}
 			const TRANSFER_SET = new Set(TRANSFER_NAMES.map(normName));
 			const TRANSFER_SET_STRIPPED = new Set(TRANSFER_NAMES.map(stripTags));
@@ -1066,116 +1770,116 @@
 				const n = normName(player.nickname);
 				if (TRANSFER_SET.has(n)) return true;
 				const st = stripTags(player.nickname);
-				return st.length > 2 && TRANSFER_SET_STRIPPED.has(st);
+				return st.length > 2 && TRANSFER_SET_STRIPPED.has(st)
 			}
 
 			function transferBadgeHTML() {
-				return '<span class="transfer-badge" title="Recently transferred into DEW"><span class="tb-dot"></span>New Transfer</span>';
+				return '<span class="transfer-badge" title="Recently transferred into DEW"><span class="tb-dot"></span>New Transfer</span>'
 			}
 			const GOV_BLOCKS = [
-				[3, 'Rare', 0],
-				[7, 'Epic', 0],
-				[11, 'Epic', 1],
-				[15, 'Mythic', 0],
-				[19, 'Mythic', 1],
-				[23, 'Mythic', 2],
-				[27, 'Mythic', 3],
-				[31, 'Legendary', 0],
-				[35, 'Legendary', 1],
-				[39, 'Legendary', 2],
-				[43, 'Legendary', 3],
-				[47, 'Legendary', 4]
+				[3, "Rare", 0],
+				[7, "Epic", 0],
+				[11, "Epic", 1],
+				[15, "Mythic", 0],
+				[19, "Mythic", 1],
+				[23, "Mythic", 2],
+				[27, "Mythic", 3],
+				[31, "Legendary", 0],
+				[35, "Legendary", 1],
+				[39, "Legendary", 2],
+				[43, "Legendary", 3],
+				[47, "Legendary", 4]
 			];
 
 			function govCode(g) {
 				if (g.progress != null && !isNaN(Number(g.progress))) return Number(g.progress);
 				const e = Number(g.equip_id) || 0;
 				if (!e) return null;
-				let c = e % 1000;
+				let c = e % 1e3;
 				if (c >= 100) c = c % 100;
-				return c;
+				return c
 			}
 
 			function govDecode(c) {
 				if (c == null) return null;
 				if (c <= 2) return {
-					quality: 'Uncommon',
+					quality: "Uncommon",
 					tier: 0,
 					stars: 0
 				};
 				let b = GOV_BLOCKS[0];
 				for (let i = 0; i < GOV_BLOCKS.length; i++) {
-					if (c >= GOV_BLOCKS[i][0]) b = GOV_BLOCKS[i];
+					if (c >= GOV_BLOCKS[i][0]) b = GOV_BLOCKS[i]
 				}
 				return {
 					quality: b[1],
 					tier: b[2],
 					stars: Math.min(3, c - b[0])
-				};
+				}
 			}
 
 			function govEffective(g) {
 				if (!g) return null;
-				const q = (g.quality || '').toLowerCase().trim();
-				if (g.decoded === 'label' && (q || g.tier != null || g.stars != null)) {
+				const q = (g.quality || "").toLowerCase().trim();
+				if (g.decoded === "label" && (q || g.tier != null || g.stars != null)) {
 					return {
 						quality: q || null,
 						tier: Number(g.tier) || 0,
 						stars: Number(g.stars) || 0
-					};
+					}
 				}
-				return govDecode(govCode(g));
+				return govDecode(govCode(g))
 			}
 
 			function govLabelOf(d) {
-				return d ? d.quality + (d.tier ? ' T' + d.tier : '') + (d.stars ? ' · ' + d.stars + '★' : '') : '-';
+				return d ? d.quality + (d.tier ? " T" + d.tier : "") + (d.stars ? " · " + d.stars + "★" : "") : "-"
 			}
 
 			function govProgress(player) {
 				const cs = (player.governor_gear || []).map(govCode).filter(c => c != null);
-				return cs.length ? cs.reduce((a, b) => a + b, 0) : null;
+				return cs.length ? cs.reduce((a, b) => a + b, 0) : null
 			}
 			const Q_SUFFIX_TO_QUALITY = {
-				"1": 'uncommon',
-				"2": 'rare',
-				"3": 'epic',
-				"4": 'mythic',
-				"5": 'legendary',
-				"6": 'legendary',
-				"7": 'mythic'
+				1: "uncommon",
+				2: "rare",
+				3: "epic",
+				4: "mythic",
+				5: "legendary",
+				6: "legendary",
+				7: "mythic"
 			};
 			const ICON_RE = /lordsequipment_icon_\d+(\d)\.png$/;
 
 			function qualityFromIcon(path) {
 				if (!path) return null;
-				const m = ICON_RE.exec(String(path).replace(/\\/g, '/'));
-				return m ? (Q_SUFFIX_TO_QUALITY[m[1]] || null) : null;
+				const m = ICON_RE.exec(String(path).replace(/\\/g, "/"));
+				return m ? Q_SUFFIX_TO_QUALITY[m[1]] || null : null
 			}
 
 			function govQuality(g) {
-				const raw = (g.quality || '').toLowerCase().trim();
-				if (raw === 'legendary' || raw === 'mythic' || raw === 'epic' || raw === 'rare' || raw === 'uncommon') return raw;
+				const raw = (g.quality || "").toLowerCase().trim();
+				if (raw === "legendary" || raw === "mythic" || raw === "epic" || raw === "rare" || raw === "uncommon") return raw;
 				const qIcon = qualityFromIcon(g.icon);
 				if (qIcon) return qIcon;
 				const dq = govDecode(govCode(g));
 				if (dq) return dq.quality.toLowerCase();
-				return 'unknown';
+				return "unknown"
 			}
 
 			function govQualityClass(g) {
 				switch (govQuality(g)) {
-					case 'legendary':
-						return 'q-legendary';
-					case 'mythic':
-						return 'q-mythic';
-					case 'epic':
-						return 'q-epic';
-					case 'rare':
-						return 'q-rare';
-					case 'uncommon':
-						return 'q-uncommon';
+					case "legendary":
+						return "q-legendary";
+					case "mythic":
+						return "q-mythic";
+					case "epic":
+						return "q-epic";
+					case "rare":
+						return "q-rare";
+					case "uncommon":
+						return "q-uncommon";
 					default:
-						return 'q-unknown';
+						return "q-unknown"
 				}
 			}
 
@@ -1183,57 +1887,57 @@
 				if (g.icon && qualityFromIcon(g.icon) === govQuality(g)) return g.icon;
 				const eid = Number(g.equip_id) || 0;
 				if (!eid) return g.icon || null;
-				const piece = Math.floor(eid / 1000);
+				const piece = Math.floor(eid / 1e3);
 				const eff = govEffective(g) || {};
-				const q = (eff.quality || '').toLowerCase();
+				const q = (eff.quality || "").toLowerCase();
 				const tier = eff.tier || 1;
 				let digit = null;
-				if (q === 'legendary') digit = tier >= 4 ? 6 : 5;
-				else if (q === 'mythic') digit = tier >= 2 ? 7 : 4;
-				else if (q === 'epic') digit = 3;
-				else if (q === 'rare') digit = 2;
-				else if (q === 'uncommon') digit = 1;
-				if (digit != null) return 'images/kingshot/lord-gear/lordsequipment_icon_' + piece + '00' + digit + '.png';
-				return g.icon || null;
+				if (q === "legendary") digit = tier >= 4 ? 6 : 5;
+				else if (q === "mythic") digit = tier >= 2 ? 7 : 4;
+				else if (q === "epic") digit = 3;
+				else if (q === "rare") digit = 2;
+				else if (q === "uncommon") digit = 1;
+				if (digit != null) return "images/kingshot/lord-gear/lordsequipment_icon_" + piece + "00" + digit + ".png";
+				return g.icon || null
 			}
 			const CATS = [{
-				id: 'combat',
-				label: 'Combat power',
+				id: "combat",
+				label: "Combat power",
 				get: p => p.combatPower,
 				fmt: fmtM,
-				icon: 'fa-bolt'
+				icon: "fa-bolt"
 			}, {
-				id: 'heroPower',
-				label: 'Hero power',
+				id: "heroPower",
+				label: "Hero power",
 				get: p => p.heroPower,
 				fmt: fmtM,
-				icon: 'fa-star'
+				icon: "fa-star"
 			}, {
-				id: 'troops',
-				label: 'Troops',
-				get: p => (p.troops && Object.keys(p.troops).length) ? dd(p).troop_score : null,
+				id: "troops",
+				label: "Troops",
+				get: p => p.troops && Object.keys(p.troops).length ? dd(p).troop_score : null,
 				fmt: null,
-				cell: 'troops',
-				icon: 'fa-users-rectangle'
+				cell: "troops",
+				icon: "fa-users-rectangle"
 			}, {
-				id: 'gov',
-				label: 'Governor gear',
+				id: "gov",
+				label: "Governor gear",
 				get: p => govProgress(p),
 				fmt: null,
-				cell: 'gov',
-				icon: 'fa-shield-halved'
+				cell: "gov",
+				icon: "fa-shield-halved"
 			}, {
-				id: 'charm',
-				label: 'Charms',
-				get: p => (p.governor_gear && p.governor_gear.length) ? dd(p).charm_level_sum_guess : null,
+				id: "charm",
+				label: "Charms",
+				get: p => p.governor_gear && p.governor_gear.length ? dd(p).charm_level_sum_guess : null,
 				fmt: fmtN,
-				cell: 'charm',
-				icon: 'fa-diamond'
+				cell: "charm",
+				icon: "fa-diamond"
 			}];
 			const CAT = {};
 			for (let i = 0; i < CATS.length; i++) CAT[CATS[i].id] = CATS[i];
-			const TROOPS = ['infantry', 'cavalry', 'archers'];
-			state.overall.add('combat');
+			const TROOPS = ["infantry", "cavalry", "archers"];
+			state.overall.add("combat");
 
 			function ranksFrom(pairs) {
 				const o = {};
@@ -1247,25 +1951,25 @@
 					i++;
 					if (v !== prev) {
 						r = i;
-						prev = v;
+						prev = v
 					}
-					o[k] = r;
+					o[k] = r
 				}
-				return o;
+				return o
 			}
 
 			function compute() {
 				RK = {};
 				for (let i = 0; i < CATS.length; i++) {
 					const c = CATS[i];
-					RK[c.id] = ranksFrom(P.map(p => [p.fid, c.get(p)]).filter(x => x[1] != null && !isNaN(x[1])));
+					RK[c.id] = ranksFrom(P.map(p => [p.fid, c.get(p)]).filter(x => x[1] != null && !isNaN(x[1])))
 				}
 				OV = {};
 				const ticked = Array.from(state.overall);
 				for (let i = 0; i < P.length; i++) {
 					const p = P[i];
 					const rs = ticked.map(id => RK[id] && RK[id][p.fid]).filter(x => x != null);
-					OV[p.fid] = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null;
+					OV[p.fid] = rs.length ? rs.reduce((a, b) => a + b, 0) / rs.length : null
 				}
 				const ord = P.map(p => [p.fid, OV[p.fid]]).filter(x => x[1] != null).sort((a, b) => a[1] - b[1]);
 				OP = {};
@@ -1278,26 +1982,26 @@
 					i++;
 					if (v !== prev) {
 						r = i;
-						prev = v;
+						prev = v
 					}
-					OP[k] = r;
+					OP[k] = r
 				}
 			}
 
 			function byFid(fid) {
 				for (let i = 0; i < P.length; i++)
 					if (P[i].fid === fid) return P[i];
-				return null;
+				return null
 			}
 
 			function rankChip(r) {
-				return r == null ? '' : '<span class="rk ' + (r <= 3 ? 'r' + r : (r <= 10 ? 'top' : '')) + '">#' + r + '</span>';
+				return r == null ? "" : '<span class="rk ' + (r <= 3 ? "r" + r : r <= 10 ? "top" : "") + '">#' + r + "</span>"
 			}
 
 			function avatar(p, big) {
-				const letter = esc((p.nickname || '?').trim().charAt(0).toUpperCase());
-				const im = p.avatar_img ? '<img src="' + esc(p.avatar_img) + '" alt="" onerror="this.remove()">' : '';
-				return '<div class="av ' + (big ? 'big' : '') + '"><span>' + letter + '</span>' + im + '</div>';
+				const letter = esc((p.nickname || "?").trim().charAt(0).toUpperCase());
+				const im = p.avatar_img ? '<img src="' + esc(p.avatar_img) + '" alt="" onerror="this.remove()">' : "";
+				return '<div class="av ' + (big ? "big" : "") + '"><span>' + letter + "</span>" + im + "</div>"
 			}
 
 			function troopCell(p) {
@@ -1306,14 +2010,14 @@
 				for (let i = 0; i < TROOPS.length; i++) {
 					const k = TROOPS[i];
 					if (!t[k]) continue;
-					parts.push('<span class="troop-pill" title="' + esc(k) + ' · ' + esc(t[k].label) + '">' + img(t[k].icon, '') + '<span class="tt">T' + t[k].tier + '</span>' + (t[k].tg != null ? '<span class="tg">TG' + t[k].tg + '</span>' : '') + '</span>');
+					parts.push('<span class="troop-pill" title="' + esc(k) + " · " + esc(t[k].label) + '">' + img(t[k].icon, "") + '<span class="tt">T' + t[k].tier + "</span>" + (t[k].tg != null ? '<span class="tg">TG' + t[k].tg + "</span>" : "") + "</span>")
 				}
-				return parts.length ? '<div class="troop-cell">' + parts.join('') + '</div>' : '<span class="text-slate-400">-</span>';
+				return parts.length ? '<div class="troop-cell">' + parts.join("") + "</div>" : '<span class="text-slate-400">-</span>'
 			}
 
 			function govLabel(player) {
 				const gears = player.governor_gear || [];
-				if (!gears.length) return '-';
+				if (!gears.length) return "-";
 				const Q_ORDER = {
 					uncommon: 0,
 					rare: 1,
@@ -1325,22 +2029,22 @@
 				for (let i = 0; i < gears.length; i++) {
 					const g = gears[i];
 					const eff = govEffective(g);
-					const q = eff ? (eff.quality || '').toLowerCase().trim() : '';
+					const q = eff ? (eff.quality || "").toLowerCase().trim() : "";
 					if (!q && !g.label) continue;
-					const tier = eff ? (eff.tier || 0) : 0;
-					const stars = eff ? (eff.stars || 0) : 0;
+					const tier = eff ? eff.tier || 0 : 0;
+					const stars = eff ? eff.stars || 0 : 0;
 					const score = (Q_ORDER[q] != null ? Q_ORDER[q] : -1) * 100 + tier * 10 + stars;
 					if (!best || score > best.score) {
 						best = {
-							score: score,
+							score,
 							label: g.label || (eff ? govLabelOf(eff) : null)
-						};
+						}
 					}
 				}
 				if (best && best.label) return best.label;
 				const cs = gears.map(govCode).filter(c => c != null);
-				if (!cs.length) return '-';
-				return govLabelOf(govDecode(Math.round(cs.reduce((a, b) => a + b, 0) / cs.length)));
+				if (!cs.length) return "-";
+				return govLabelOf(govDecode(Math.round(cs.reduce((a, b) => a + b, 0) / cs.length)))
 			}
 
 			function govGearImages(p) {
@@ -1352,18 +2056,53 @@
 					const iconPath = govIconPath(g);
 					if (!iconPath) {
 						tiles.push('<div class="gear-tile"><span class="text-slate-400 text-[10px]">-</span></div>');
-						continue;
+						continue
 					}
 					const qc = govQualityClass(g);
 					const eff = govEffective(g);
-					const stars = eff ? (eff.stars || 0) : 0;
-					const tier = eff ? (eff.tier || 0) : 0;
-					const starRow = '<span class="stars">' + (stars > 0 ? '★'.repeat(stars) : '\u00a0') + '</span>';
-					const tierRow = '<span class="tier">' + (tier > 0 ? 'T' + tier : '\u00a0') + '</span>';
-					const tip = (g.name || '') + ' · ' + (g.label || govQuality(g));
-					tiles.push('<div class="gear-tile" title="' + esc(tip) + '"><div class="gear-frame ' + qc + '"><img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15"></div>' + starRow + tierRow + '</div>');
+					const stars = eff ? eff.stars || 0 : 0;
+					const tier = eff ? eff.tier || 0 : 0;
+					const starRow = '<span class="stars">' + (stars > 0 ? "★".repeat(stars) : " ") + "</span>";
+					const tierRow = '<span class="tier">' + (tier > 0 ? "T" + tier : " ") + "</span>";
+					const tip = (g.name || "") + " · " + (g.label || govQuality(g));
+					tiles.push('<div class="gear-tile" title="' + esc(tip) + '"><div class="gear-frame ' + qc + '"><img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15"></div>' + starRow + tierRow + "</div>")
 				}
-				return '<div class="gear-icon-grid">' + tiles.join('') + '</div>';
+				return '<div class="gear-icon-grid">' + tiles.join("") + "</div>"
+			}
+
+			function govMobileGearCharmHTML(p) {
+				const gears = p.governor_gear || [];
+				if (!gears.length) {
+					return '<span class="text-slate-400">-</span>'
+				}
+				const groups = [];
+				for (let i = 0; i < 6; i++) {
+					const g = gears[i];
+					if (!g) {
+						groups.push('<div class="mobile-gear-group">' + '<span class="text-slate-400 text-xs">-</span>' + "</div>");
+						continue
+					}
+					const iconPath = govIconPath(g);
+					const qc = govQualityClass(g);
+					const eff = govEffective(g);
+					const stars = eff ? eff.stars || 0 : 0;
+					const tier = eff ? eff.tier || 0 : 0;
+					const gearImage = iconPath ? '<div class="gear-frame ' + qc + '">' + '<img src="' + esc(iconPath) + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' + "</div>" : '<div class="gear-frame q-unknown">' + '<span class="text-white text-xs">-</span>' + "</div>";
+					const starRow = '<span class="stars">' + (stars > 0 ? "★".repeat(stars) : "&nbsp;") + "</span>";
+					const tierRow = '<span class="tier">' + (tier > 0 ? "T" + tier : "&nbsp;") + "</span>";
+					const charms = g.charms || [];
+					const charmHTML = [];
+					for (let j = 0; j < 3; j++) {
+						const c = charms[j];
+						if (c) {
+							charmHTML.push('<span class="charm-item" title="Charm · Lv' + esc(c.level_guess) + '">' + '<img src="' + esc(c.icon) + '" alt="" loading="lazy" onerror="this.style.opacity=.15">' + '<span class="lv">' + esc(c.level_guess) + "</span>" + "</span>")
+						} else {
+							charmHTML.push('<span class="charm-item">' + '<span class="text-slate-300 text-xs">-</span>' + "</span>")
+						}
+					}
+					groups.push('<div class="mobile-gear-group" title="' + esc(g.name || "Governor Gear") + '">' + '<div class="gear-tile">' + gearImage + starRow + tierRow + "</div>" + '<div class="mobile-gear-charms">' + charmHTML.join("") + "</div>" + "</div>")
+				}
+				return '<div class="mobile-gov-grid">' + groups.join("") + "</div>"
 			}
 
 			function govCharmImages(p) {
@@ -1372,37 +2111,45 @@
 				let html = '<div class="charm-icon-grid">';
 				for (let i = 0; i < 6; i++) {
 					const g = gears[i];
-					const charms = (g && g.charms) || [];
+					const charms = g && g.charms || [];
 					const groups = [];
 					for (let j = 0; j < charms.length; j++) {
 						const c = charms[j];
-						groups.push('<span class="charm-item" title="Lv' + c.level_guess + ' · raw ' + c.raw + '"><img src="' + esc(c.icon) + '" alt="" onerror="this.style.opacity=.15"><span class="lv">' + c.level_guess + '</span></span>');
+						groups.push('<span class="charm-item" title="Lv' + c.level_guess + " · raw " + c.raw + '"><img src="' + esc(c.icon) + '" alt="" onerror="this.style.opacity=.15"><span class="lv">' + c.level_guess + "</span></span>")
 					}
-					html += '<div class="charm-group">' + (groups.length ? groups.join('') : '<span class="text-slate-300 text-[10px]">-</span>') + '</div>';
+					html += '<div class="charm-group">' + (groups.length ? groups.join("") : '<span class="text-slate-300 text-[10px]">-</span>') + "</div>"
 				}
-				html += '</div>';
-				return html;
+				html += "</div>";
+				return html
 			}
 
 			function cellHTML(c, p) {
 				const v = c.get(p);
-				if (v == null) return '<span class="text-slate-400">-</span>';
+				if (v == null) {
+					return '<span class="text-slate-400">-</span>'
+				}
 				const rk = rankChip(RK[c.id][p.fid]);
-				if (c.cell === 'troops') return '<div class="cell-main">' + troopCell(p) + rk + '</div>';
-				if (c.cell === 'gov') return '<div class="cell-main">' + govGearImages(p) + rk + '</div>';
-				if (c.cell === 'charm') return '<div class="cell-main">' + govCharmImages(p) + rk + '</div>';
-				return '<div class="cell-main"><span class="cell-val">' + c.fmt(v) + '</span>' + rk + '</div>';
+				if (c.cell === "troops") {
+					return '<div class="cell-main">' + troopCell(p) + rk + "</div>"
+				}
+				if (c.cell === "gov") {
+					return '<div class="cell-main">' + '<span class="desktop-gov-content">' + govGearImages(p) + "</span>" + '<span class="mobile-gov-content">' + govMobileGearCharmHTML(p) + "</span>" + rk + "</div>"
+				}
+				if (c.cell === "charm") {
+					return '<div class="cell-main desktop-charm-content">' + govCharmImages(p) + rk + "</div>"
+				}
+				return '<div class="cell-main">' + '<span class="cell-val">' + c.fmt(v) + "</span>" + rk + "</div>"
 			}
 
 			function tableRows() {
 				const q = state.search;
-				let rows = P.filter(p => !q || (p.nickname || '').toLowerCase().indexOf(q) !== -1);
+				let rows = P.filter(p => !q || (p.nickname || "").toLowerCase().indexOf(q) !== -1);
 				if (state.excludeTransfers) rows = rows.filter(p => !p.isTransfer);
 				const k = state.sortKey;
 				const val = p => {
-					if (k === 'overall') return OV[p.fid];
-					if (k === 'name') return (p.nickname || '').toLowerCase();
-					return CAT[k].get(p);
+					if (k === "overall") return OV[p.fid];
+					if (k === "name") return (p.nickname || "").toLowerCase();
+					return CAT[k].get(p)
 				};
 				rows.sort((a, b) => {
 					const x = val(a),
@@ -1410,42 +2157,42 @@
 					if (x == null && y == null) return 0;
 					if (x == null) return 1;
 					if (y == null) return -1;
-					return (x < y ? -1 : x > y ? 1 : 0) * state.sortDir;
+					return (x < y ? -1 : x > y ? 1 : 0) * state.sortDir
 				});
-				return rows;
+				return rows
 			}
 
 			function leadChipsHTML(p) {
 				const lead = p.lead || [];
-				if (!lead.length) return '';
+				if (!lead.length) return "";
 				const parts = [];
 				for (let j = 0; j < lead.length; j++) {
 					const l = lead[j];
 					const nm = heroName(l.id, p);
 					const title = nm;
-					parts.push('<span class="lead-chip" title="' + esc(title) + '">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" onerror="this.style.opacity=0.15">' + '<span>' + esc(nm) + '</span>' + '</span>');
+					parts.push('<span class="lead-chip" title="' + esc(title) + '">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" onerror="this.style.opacity=0.15">' + "<span>" + esc(nm) + "</span>" + "</span>")
 				}
-				return parts.join('');
+				return parts.join("")
 			}
 
 			function renderTable() {
 				const rows = tableRows();
-				const th = (key, label, cls) => '<div class="grid-cell grid-header ' + (cls || '') + ' ' + (state.sortKey === key ? 'text-indigo-600' : '') + '" data-k="' + key + '">' + label + ' ' + (state.sortKey === key ? (state.sortDir > 0 ? '▲' : '▼') : '') + '</div>';
+				const th = (key, label, cls) => '<div class="grid-cell grid-header ' + (cls || "") + " " + (state.sortKey === key ? "text-indigo-600" : "") + '" data-k="' + key + '">' + label + " " + (state.sortKey === key ? state.sortDir > 0 ? "▲" : "▼" : "") + "</div>";
 				const shortLabels = {
-					combat: 'Combat',
-					heroPower: 'Hero pwr',
-					troops: 'Troops',
-					gov: 'Gov gear',
-					charm: 'Charms'
+					combat: "Combat",
+					heroPower: "Hero pwr",
+					troops: "Troops",
+					gov: "Gov gear",
+					charm: "Charms"
 				};
-				let h = '<div class="grid-row grid-header">' + th('overall', 'Rank', 'rank') + th('name', 'Player', 'pl') + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join('') + '</div>';
+				let h = '<div class="grid-row grid-header">' + th("overall", "Rank", "rank") + th("name", "Player", "pl") + CATS.map(c => th(c.id, shortLabels[c.id] || c.label)).join("") + "</div>";
 				for (let i = 0; i < rows.length; i++) {
 					const p = rows[i];
 					const leads = leadChipsHTML(p);
-					const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
-					h += '<div class="grid-row ' + (p.isTransfer ? 'is-transfer' : '') + '" data-f="' + p.fid + '">' + '<div class="grid-cell rank font-bold text-indigo-700">' + (OP[p.fid] != null ? '#' + OP[p.fid] : '-') + '</div>' + '<div class="grid-cell pl"><div class="flex items-center gap-3">' + avatar(p) + '<div class="min-w-0" style="overflow:hidden"><div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.nickname) + transferBadge + '</div>' + (leads ? '<div class="lead-row">' + leads + '</div>' : '') + '</div></div></div>' + CATS.map(c => '<div class="grid-cell" title="' + esc(c.label) + '">' + cellHTML(c, p) + '</div>').join('') + '</div>';
+					const transferBadge = p.isTransfer ? transferBadgeHTML() : "";
+					h += '<div class="grid-row ' + (p.isTransfer ? "is-transfer" : "") + '" data-f="' + p.fid + '">' + '<div class="grid-cell rank font-bold text-indigo-700">' + (OP[p.fid] != null ? "#" + OP[p.fid] : "-") + "</div>" + '<div class="grid-cell pl"><div class="flex items-center gap-3">' + avatar(p) + '<div class="min-w-0" style="overflow:hidden"><div class="font-semibold text-[13.5px]" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.nickname) + transferBadge + "</div>" + (leads ? '<div class="lead-row">' + leads + "</div>" : "") + "</div></div></div>" + CATS.map(c => '<div class="grid-cell" data-label="' + esc(c.label) + '" title="' + esc(c.label) + '">' + cellHTML(c, p) + "</div>").join("") + "</div>"
 				}
-				$('#tbl').innerHTML = h;
+				$("#tbl").innerHTML = h
 			}
 
 			function renderStats() {
@@ -1458,7 +2205,7 @@
 				const oldest = P.filter(p => p.ageDays != null).sort((a, b) => b.ageDays - a.ageDays)[0];
 				const transferCount = P.filter(p => p.isTransfer).length;
 				const card = (label, value, sub, icon, color) => '<div class="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><div class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">' + label + '</div><div class="text-2xl font-bold mt-1 tabular-nums">' + value + '</div><div class="text-[11.5px] text-slate-500 mt-1 truncate">' + sub + '</div></div><div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-none ' + color + '"><i class="fas ' + icon + ' text-xl"></i></div></div></div>';
-				$('#statGrid').innerHTML = card('Members', total, 'avg combat <b>' + fmtM(Math.round(avg(combats))) + '</b>', 'fa-users', 'bg-blue-100 text-blue-600') + card('Top combat', top ? fmtM(top.combatPower) : '-', top ? esc(top.nickname) : '-', 'fa-crown', 'bg-yellow-100 text-yellow-600') + card('New transfers', transferCount, transferCount ? '<b>' + transferCount + '</b> recently joined DEW' : 'none matched', 'fa-arrow-right-to-bracket', 'bg-amber-100 text-amber-600') + card('Avg furnace level', furnaces.length ? avg(furnaces).toFixed(1) : '-', 'max <b>' + (furnaces.length ? Math.max.apply(null, furnaces) : '-') + '</b>', 'fa-fire', 'bg-rose-100 text-rose-600') + card('Total champ kills', fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + ' players with data', 'fa-skull', 'bg-purple-100 text-purple-600') + card('Data freshness', (oldest && oldest.ageDays) ? oldest.ageDays + 'd' : 'fresh', (oldest && oldest.ageDays) ? esc(oldest.nickname) + ' is oldest' : 'all data &lt; 7d', 'fa-clock', 'bg-sky-100 text-sky-600');
+				$("#statGrid").innerHTML = card("Members", total, "avg combat <b>" + fmtM(Math.round(avg(combats))) + "</b>", "fa-users", "bg-blue-100 text-blue-600") + card("Top combat", top ? fmtM(top.combatPower) : "-", top ? esc(top.nickname) : "-", "fa-crown", "bg-yellow-100 text-yellow-600") + card("New transfers", transferCount, transferCount ? "<b>" + transferCount + "</b> recently joined DEW" : "none matched", "fa-arrow-right-to-bracket", "bg-amber-100 text-amber-600") + card("Avg furnace level", furnaces.length ? avg(furnaces).toFixed(1) : "-", "max <b>" + (furnaces.length ? Math.max.apply(null, furnaces) : "-") + "</b>", "fa-fire", "bg-rose-100 text-rose-600") + card("Total champ kills", fmtM(champKills.reduce((a, b) => a + b, 0)), champKills.length + " players with data", "fa-skull", "bg-purple-100 text-purple-600") + card("Data freshness", oldest && oldest.ageDays ? oldest.ageDays + "d" : "fresh", oldest && oldest.ageDays ? esc(oldest.nickname) + " is oldest" : "all data &lt; 7d", "fa-clock", "bg-sky-100 text-sky-600")
 			}
 
 			function renderCatToggles() {
@@ -1466,428 +2213,274 @@
 				for (let i = 0; i < CATS.length; i++) {
 					const c = CATS[i];
 					const on = state.overall.has(c.id);
-					out.push('<label class="chip-toggle ' + (on ? 'on' : '') + '"><input type="checkbox" data-c="' + c.id + '" class="hidden" ' + (on ? 'checked' : '') + '><span class="dot"></span>' + esc(c.label) + '</label>');
+					out.push('<label class="chip-toggle ' + (on ? "on" : "") + '"><input type="checkbox" data-c="' + c.id + '" class="hidden" ' + (on ? "checked" : "") + '><span class="dot"></span>' + esc(c.label) + "</label>")
 				}
-				$('#overallcats').innerHTML = out.join('');
+				$("#overallcats").innerHTML = out.join("")
 			}
 
 			function sec(title, body, hint) {
-				return '<div class="mb-7"><h3 class="sec-h">' + esc(title) + (hint ? ' <span class="hint">' + hint + '</span>' : '') + '</h3>' + body + '</div>';
+				return '<div class="mb-7"><h3 class="sec-h">' + esc(title) + (hint ? ' <span class="hint">' + hint + "</span>" : "") + "</h3>" + body + "</div>"
 			}
 
 			function kvBlock(entries) {
 				const rows = [];
 				for (let i = 0; i < entries.length; i++) {
 					const e = entries[i];
-					if (!e || e[1] == null || e[1] === '') continue;
-					rows.push('<div><span>' + esc(e[0]) + '</span><span>' + esc(e[1]) + '</span></div>');
+					if (!e || e[1] == null || e[1] === "") continue;
+					rows.push("<div><span>" + esc(e[0]) + "</span><span>" + esc(e[1]) + "</span></div>")
 				}
-				return rows.length ? '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows.join('') + '</div>' : '';
+				return rows.length ? '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows.join("") + "</div>" : ""
 			}
 
 			function coreBlock(p) {
-				return sec('Overview', kvBlock([
-					['Nickname', p.nickname],
-					['Player ID', p.fid || (p.spec && p.spec['Player ID'])],
-					['New transfer', p.isTransfer ? 'Yes — recently joined DEW' : null],
-					['Inactive', p.inactive ? 'Yes' : 'No'],
-					['Combat power', fmtM(p.combatPower)],
-					['Total power', p.power != null ? fmtM(p.power) : null],
-					['Hero power', fmtM(p.heroPower)],
-					['Furnace (Town Center)', p.furnaceLevel],
-					['Life tree level', p.lifeTreeLevel],
-					['Strat score', p.stratScore],
-					['Score', p.score],
-					['Confidence', p.confidence],
-					['Source', p.source],
-					['Office', p.office],
-					['Alliance rank', p.rank != null ? '#' + p.rank : null],
-					['Kingdom rank', p.kingdom_rank ? ('#' + p.kingdom_rank.rank + ' / ' + p.kingdom_rank.of) : null],
-					['Marksman attack', pct(p.marksmanAttackPct)],
-					['Marksman lethality', pct(p.marksmanLethalityPct)],
-					['Rally attack', p.rallyWidget ? pct(p.rallyWidget.attackPct) : null],
-					['Rally lethality', p.rallyWidget ? pct(p.rallyWidget.lethalityPct) : null],
-					['Capacity', p.capacity != null ? (fmtM(p.capacity) + (p.capacityExact ? '' : ' (est)')) : null],
-					['March share', p.marchShare != null ? (p.marchShare * 100).toFixed(1) + '%' : null],
-					['Capacity share', p.capacityShare != null ? (p.capacityShare * 100).toFixed(1) + '%' : null],
-					['Data as of', p.asOf ? timeAgo(p.asOf) : null],
-					['Data age', p.ageDays != null ? (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old') : null]
-				]));
+				return sec("Overview", kvBlock([
+					["Nickname", p.nickname],
+					["Player ID", p.fid || p.spec && p.spec["Player ID"]],
+					["New transfer", p.isTransfer ? "Yes — recently joined DEW" : null],
+					["Combat power", fmtM(p.combatPower)],
+					["Total power", p.power != null ? fmtM(p.power) : null],
+					["Hero power", fmtM(p.heroPower)],
+					["Town Center", p.furnaceLevel]
+				]))
 			}
 
 			function leadBlock(p) {
 				const lead = p.lead || [];
-				if (!lead.length) return '';
+				if (!lead.length) return "";
 				const chips = lead.map(l => {
 					const nm = heroName(l.id, p);
-					return '<span class="chip" style="gap:8px">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15">' + '<b>' + esc(nm) + '</b>' + '</span>';
-				}).join('');
-				return sec('Lead heroes', '<div class="flex flex-wrap gap-2.5">' + chips + '</div>');
+					return '<span class="chip" style="gap:8px">' + '<img src="' + esc(heroIcon(l.id)) + '" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.12)" onerror="this.style.opacity=.15">' + "<b>" + esc(nm) + "</b>" + "</span>"
+				}).join("");
+				return sec("Lead heroes", '<div class="flex flex-wrap gap-2.5">' + chips + "</div>")
 			}
 
 			function troopsBlock(p) {
 				const t = p.troops || {};
-				if (!Object.keys(t).length) return sec('Troops', '<div class="text-slate-400 text-sm">No troop data.</div>');
+				if (!Object.keys(t).length) return sec("Troops", '<div class="text-slate-400 text-sm">No troop data.</div>');
 				const cards = [];
 				for (let i = 0; i < TROOPS.length; i++) {
 					const k = TROOPS[i];
 					if (!t[k]) continue;
-					cards.push('<div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">' + img(t[k].icon, 'w-14 h-14 rounded-lg') + '<div><div class="text-sm font-semibold capitalize">' + esc(k) + '</div><div class="text-[11.5px] text-slate-500">Tier ' + t[k].tier + ' · TG ' + t[k].tg + '</div></div></div>');
+					cards.push('<div class="flex items-center gap-3 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3">' + img(t[k].icon, "w-14 h-14 rounded-lg") + '<div><div class="text-sm font-semibold capitalize">' + esc(k) + '</div><div class="text-[11.5px] text-slate-500">Tier ' + t[k].tier + " · TG " + t[k].tg + "</div></div></div>")
 				}
-				return sec('Troops (top tier per type)', '<div class="flex flex-wrap gap-3">' + cards.join('') + '</div>');
+				return sec("Troops (top tier per type)", '<div class="flex flex-wrap gap-3">' + cards.join("") + "</div>")
 			}
 
 			function heroGearClass(g) {
 				const t = Number(g.tier),
 					e = Number(g.enhance) || 0;
-				if (t === 5) return e > 100 ? 'gi t5r' : 'gi t5';
-				if (t === 4) return 'gi t4';
-				if (t === 3) return 'gi t3';
-				if (t === 2) return 'gi t2';
-				return 'gi t1';
+				if (t === 5) return e > 100 ? "gi t5r" : "gi t5";
+				if (t === 4) return "gi t4";
+				if (t === 3) return "gi t3";
+				if (t === 2) return "gi t2";
+				return "gi t1"
 			}
-			/* MODAL HERO CARD — gear tiles (forge bottom-right, +N top-right oval) + gold widget tile (+N top-right) */
+
 			function heroHTML(h, p) {
 				const gear = (h.gear || []).map(g => {
-					const tip = (g.name || 'Gear') + ' · Forge ' + g.refine + ' · Lv' + g.enhance_level + (g.enhance_plus ? ' +' + g.enhance_plus : '') + (g.exp != null ? ' · XP ' + g.exp : '');
-					/* Forge level — bottom right */
-					const forge = (g.refine != null && Number(g.refine) > 0) ? '<span class="gear-forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">Lv. ' + g.refine + '</span>' : '';
-					/* Enhance +N oval — top right */
+					const tip = (g.name || "Gear") + " · Forge " + g.refine + " · Lv" + g.enhance_level + (g.enhance_plus ? " +" + g.enhance_plus : "") + (g.exp != null ? " · XP " + g.exp : "");
+					const forge = g.refine != null && Number(g.refine) > 0 ? '<span class="gear-forge-badge"><img src="images/kingshot/items/item_icon_500240.png" alt="">Lv. ' + g.refine + "</span>" : "";
 					const plus = Number(g.enhance_plus) || 0;
 					const plusTier = plusTierClass(plus);
-					const plusBadge = (plus > 0) ? '<span class="gear-plus-badge ' + plusTier + '">+' + plus + '</span>' : '';
-					/* Under the icon: base enhance level text (no oval), e.g. 100 */
+					const plusBadge = plus > 0 ? '<span class="gear-plus-badge ' + plusTier + '">+' + plus + "</span>" : "";
 					const baseLevel = g.enhance_level != null ? g.enhance_level : 0;
-					const baseLine = '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + baseLevel + '</span>';
-					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + plusBadge + baseLine + '</div>';
-				}).join('');
-				/* Widget level = hero.exclusive.level, shown as +N top-right of gold frame */
+					const baseLine = '<span class="block text-[11px] text-slate-700 mt-1 tabular-nums font-semibold">' + baseLevel + "</span>";
+					return '<div class="text-center relative" title="' + esc(tip) + '">' + img(g.icon, heroGearClass(g)) + forge + plusBadge + baseLine + "</div>"
+				}).join("");
 				const wLvl = widgetLevelFromHero(h);
 				const wSrc = widgetIcon(h.hero_id, p);
-				let widgetTile = '';
+				let widgetTile = "";
 				if (wLvl != null) {
-					widgetTile = '<div class="widget-tile" title="Hero widget · Level ' + wLvl + '">' + '<div class="widget-frame">' + (wSrc ? '<img src="' + esc(wSrc) + '" alt="" loading="lazy" onerror="this.style.opacity=.25">' : '') + '<span class="wlv">+' + wLvl + '</span>' + '</div>' + '<span class="widget-label">Widget</span>' + '</div>';
+					widgetTile = '<div class="widget-tile" title="Hero widget · Level ' + wLvl + '">' + '<div class="widget-frame">' + (wSrc ? '<img src="' + esc(wSrc) + '" alt="" loading="lazy" onerror="this.style.opacity=.25">' : "") + '<span class="wlv">+' + wLvl + "</span>" + "</div>" + '<span class="widget-label"></span>' + "</div>"
 				}
-				const ex = h.exclusive ? ' · Exclusive Lv' + h.exclusive.level : '';
-				const skills = (h.skills || []).map(sk => esc(sk.name || ('Skill ' + sk.id)) + ' Lv' + (sk.level != null ? sk.level : 0)).join(' · ');
-				const name = heroName(h.hero_id, p) || h.name || ('Hero ' + h.hero_id);
-				const gearCols = wLvl != null ? 'grid-cols-5' : 'grid-cols-4';
-				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col">' + '<div class="flex items-center gap-3 mb-2">' + img(h.icon, 'w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none') + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(name) + '</div><div class="text-[12px] text-slate-500">' + (h.star != null ? h.star : 0) + '★ · Lv' + (h.level != null ? h.level : '-') + ex + '</div></div>' + '</div>' + '<div class="text-[11px] text-slate-500 mb-2 truncate" title="' + esc(skills) + '" style="min-height:16px">' + esc(skills) + '</div>' + '<div class="grid ' + gearCols + ' gap-2 mt-auto pt-3">' + gear + widgetTile + '</div>' + '</div>';
+				const ex = h.exclusive ? "" : "";
+				const rawStars = Math.max(0, Number(h.star) || 0);
+				const heroStars = Math.floor(rawStars / 6) + rawStars % 6 / 10;
+				const starLabel = Number.isInteger(heroStars) ? String(heroStars) : heroStars.toFixed(1);
+				const name = heroName(h.hero_id, p) || h.name || "Hero " + h.hero_id;
+				const gearCols = wLvl != null ? "grid-cols-5" : "grid-cols-4";
+				return '<div class="bg-slate-50 border border-slate-100 rounded-xl p-4 h-full flex flex-col">' + '<div class="flex items-center gap-3 mb-2">' + img(h.icon, "w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm flex-none") + '<div class="min-w-0"><div class="font-semibold text-[15px] truncate">' + esc(name) + '</div><div class="text-[12px] text-slate-500">' + starLabel + "★ · Lv" + (h.level != null ? h.level : "-") + ex + "</div></div>" + "</div>" + '<div class="grid ' + gearCols + ' gap-2 mt-auto pt-3">' + gear + widgetTile + "</div>" + "</div>"
 			}
 
 			function heroesBlock(p) {
 				const hs = p.heroes || [];
-				return hs.length ? sec('Heroes & hero gear', '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + hs.map(h => heroHTML(h, p)).join('') + '</div>') : '';
+				return hs.length ? sec("Heroes & hero gear", '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + hs.map(h => heroHTML(h, p)).join("") + "</div>") : ""
 			}
 
 			function govHTML(g) {
-				const ch = (g.charms || []).map(c => '<div class="text-center w-12" title="Charm · raw ' + c.raw + ' · level guess ' + c.level_guess + '">' + img(c.icon, 'w-11 h-11 mx-auto rounded') + '<span class="block text-[12px] text-slate-600 font-bold tabular-nums mt-1">' + c.level_guess + '</span></div>').join('');
+				const ch = (g.charms || []).map(c => '<div class="text-center w-12" title="Charm · raw ' + c.raw + " · level guess " + c.level_guess + '">' + img(c.icon, "w-11 h-11 mx-auto rounded") + '<span class="block text-[12px] text-slate-600 font-bold tabular-nums mt-1">' + c.level_guess + "</span></div>").join("");
 				const qc = govQualityClass(g);
 				const iconPath = govIconPath(g);
-				const imgs = iconPath ? '<img src="' + esc(iconPath) + '" class="gi2" alt="" loading="lazy" onerror="this.style.opacity=.15">' : '';
+				const imgs = iconPath ? '<img src="' + esc(iconPath) + '" class="gi2" alt="" loading="lazy" onerror="this.style.opacity=.15">' : "";
 				const eff = govEffective(g);
-				const nstars = eff ? (eff.stars || 0) : 0;
-				const stars = nstars ? '<span class="st">' + '★'.repeat(nstars) + '</span>' : '';
-				const label = g.label || (eff ? govLabelOf(eff) : (g.quality || ''));
-				return '<div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5"><div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div><div class="flex-1 min-w-0"><div class="text-[15px] font-semibold truncate">' + esc(g.name || 'Gear piece') + '</div><div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + '</div>' + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5">ID ' + g.equip_id + (g.progress != null ? ' · progress ' + g.progress : '') + '</div>' : '') + '</div><div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + '</div></div>';
+				const nstars = eff ? eff.stars || 0 : 0;
+				const stars = nstars ? '<span class="st">' + "★".repeat(nstars) + "</span>" : "";
+				const label = g.label || (eff ? govLabelOf(eff) : g.quality || "");
+				return '<div class="gov-gear-card flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-3.5"><div class="modal-gear-wrapper ' + qc + '">' + imgs + stars + '</div><div class="flex-1 min-w-0"><div class="text-[15px] font-semibold truncate">' + esc(g.name || "Gear piece") + '</div><div class="text-[13px] text-slate-600 mt-0.5">' + esc(label) + "</div>" + (g.equip_id != null ? '<div class="text-[11px] text-slate-400 mt-0.5"> ' + "</div>" : "") + '</div><div class="flex gap-2 flex-none">' + (ch || '<span class="text-slate-400 text-xs">No charms</span>') + "</div></div>"
 			}
 
 			function govBlock(p) {
 				const g = p.governor_gear || [];
-				if (!g.length) return '';
-				return sec('Governor gear & charms', '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + g.map(govHTML).join('') + '</div>', '(charm levels estimated)');
-			}
-
-			function boardsBlock(p) {
-				const bs = p.board_standings || [];
-				return bs.length ? sec('Kingdom standings', kvBlock(bs.map(b => [b.label, '#' + b.rank + ' · ' + b.value]))) : '';
-			}
-
-			function powerBlock(p) {
-				const pb = p.power_breakdown || {};
-				return Object.keys(pb).length ? sec('Power breakdown' + (p.power_summary ? ' <span class="hint">' + esc(p.power_summary) + '</span>' : ''), kvBlock(Object.keys(pb).map(k => [k, pb[k]]))) : '';
-			}
-
-			function specBlock(p) {
-				const sp = p.spec || {};
-				return Object.keys(sp).length ? sec('Spec', kvBlock(Object.keys(sp).map(k => [k, sp[k]]))) : '';
+				if (!g.length) return "";
+				return sec("Governor gear & charms", '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' + g.map(govHTML).join("") + "</div>", "")
 			}
 
 			function marchBlock(p) {
 				const m = p.march_stats || {};
-				if (!Object.keys(m).length) return '';
-				const types = ['infantry', 'cavalry', 'archer'];
-				const stats = ['attack', 'defense', 'lethality', 'health'];
+				if (!Object.keys(m).length) return "";
+				const types = ["infantry", "cavalry", "archer"];
+				const stats = ["attack", "defense", "lethality", "health"];
 				let tbl = '<div class="overflow-auto rounded-xl border border-slate-100"><table class="w-full text-sm"><thead><tr><th class="bg-slate-50 px-4 py-3 text-left text-[11px] uppercase tracking-wider text-slate-500"></th>';
-				for (let i = 0; i < types.length; i++) tbl += '<th class="bg-slate-50 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">' + esc(types[i]) + '</th>';
-				tbl += '</tr></thead><tbody>';
+				for (let i = 0; i < types.length; i++) tbl += '<th class="bg-slate-50 px-4 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">' + esc(types[i]) + "</th>";
+				tbl += "</tr></thead><tbody>";
 				for (let i = 0; i < stats.length; i++) {
 					const stat = stats[i];
-					tbl += '<tr><td class="px-4 py-2.5 text-slate-500 capitalize border-t border-slate-100">' + stat + '</td>';
+					tbl += '<tr><td class="px-4 py-2.5 text-slate-500 capitalize border-t border-slate-100">' + stat + "</td>";
 					for (let j = 0; j < types.length; j++) {
-						const v = (m[stat] || {})[types[j]] || '-';
-						tbl += '<td class="px-4 py-2.5 text-center border-t border-slate-100 tabular-nums font-medium">' + esc(v) + '</td>';
+						const v = (m[stat] || {})[types[j]] || "-";
+						tbl += '<td class="px-4 py-2.5 text-center border-t border-slate-100 tabular-nums font-medium">' + esc(v) + "</td>"
 					}
-					tbl += '</tr>';
+					tbl += "</tr>"
 				}
-				tbl += '</tbody></table></div>';
-				return sec('March stats', tbl);
-			}
-
-			function champBlock(p) {
-				const c = p.championship || {};
-				if (!Object.keys(c).length) return '';
-				const entries = [
-					['Season', c.season],
-					['Brought', c.brought != null ? fmtN(c.brought) : null],
-					['Killed', c.killed != null ? fmtN(c.killed) : null],
-					['Lost', c.lost != null ? fmtN(c.lost) : null],
-					['Wounded', c.wounded != null ? fmtN(c.wounded) : null],
-					['Power lost', c.power_lost],
-					['Advisor', c.advisor],
-					['Advisor level', c.advisor_level]
-				];
-				if (c.troops) Object.keys(c.troops).forEach(k => entries.push(['Troops: ' + k, fmtN(c.troops[k])]));
-				return sec('Championship', kvBlock(entries));
-			}
-
-			function islandBlock(p) {
-				const is = p.island || {};
-				if (!Object.keys(is).length) return '';
-				const b = Object.keys(is.bonuses || {}).map(k => [k, is.bonuses[k]]);
-				return sec('Island <span class="hint">prosperity ' + fmtN(is.prosperity) + ' · ' + fmtN(is.likes) + ' likes</span>', b.length ? kvBlock(b) : '<div class="text-slate-400 text-sm">No bonuses.</div>');
-			}
-
-			function findPlayerByName(name) {
-				const n = normName(name);
-				if (!n || n === '(this player)') return null;
-				for (let i = 0; i < P.length; i++)
-					if (normName(P[i].nickname) === n) return P[i];
-				return null;
-			}
-
-			function playerLink(name) {
-				const hit = findPlayerByName(name);
-				if (!hit) return '<span>' + esc(name) + '</span>';
-				return '<a href="#" class="player-link" data-f="' + esc(hit.fid) + '" title="Open ' + esc(hit.nickname) + '">' + esc(name) + '</a>';
-			}
-
-			function compBlock(p) {
-				const c = p.competition || [];
-				if (!c.length) return '';
-				const rows = c.map(x => {
-					const isSelf = normName(x.name) === normName(p.nickname) || String(x.power || '').indexOf('this player') !== -1;
-					const nameHtml = isSelf ? '<span class="font-semibold text-indigo-700">' + esc(x.name) + '</span>' : playerLink(x.name);
-					return '<div><span>#' + esc(x.rank) + ' ' + nameHtml + '</span><span>' + esc(x.power) + '</span></div>';
-				}).join('');
-				return sec('Competition', '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>');
-			}
-
-			function linkedBlock(p) {
-				const l = p.linked_accounts || [];
-				if (!l.length) return '';
-				const rows = l.map(a => '<div><span>' + playerLink(a.name) + ' · ' + esc(a.kingdom || '') + ' · ' + esc(a.tc || '') + '</span><span>' + esc(a.power) + '</span></div>').join('');
-				return sec('Linked accounts', '<div class="kv grid grid-cols-1 md:grid-cols-2 gap-x-8">' + rows + '</div>');
-			}
-
-			function worldBlock(p) {
-				const w = p.world_position || {};
-				const ev = p.open_events || [];
-				if (!Object.keys(w).length && !ev.length) return '';
-				const chips = (w.x != null ? '<span class="chip">Position <b>' + w.x + ',' + w.y + '</b></span>' : '') + (w.shield ? '<span class="chip">Shield <b>' + esc(w.shield) + '</b></span>' : '');
-				const evs = ev.length ? kvBlock(ev.map(e => [e.type, e.x + ',' + e.y])) : '';
-				return sec('World', '<div class="flex flex-wrap gap-2 mb-2">' + chips + '</div>' + evs);
-			}
-
-			function identityBlock(p) {
-				const h = p.identity_history || [];
-				if (!h.length) return '';
-				const rows = h.map(ev => {
-					if (ev.event === 'Moved') return ['Moved', (ev.from || '') + ' → ' + (ev.to || '') + (ev.when ? ' · ' + ev.when : '')];
-					return [ev.event || 'Event', ev.when || ''];
-				});
-				return sec('Identity history', kvBlock(rows));
-			}
-
-			function loadoutBlock(p) {
-				const lo = p.loadout || {};
-				if (!Object.keys(lo).length) return '';
-				return sec('Loadout', kvBlock([
-					['Gear upgraded', lo.gear_upgraded ? 'Yes' : null],
-					['Heroes seen', lo.heroes_seen],
-					['Deployed', lo.deployed]
-				]));
-			}
-
-			function derivedBlock(p) {
-				const d = p.derived || {};
-				if (!Object.keys(d).length) return '';
-				return sec('Derived totals', kvBlock([
-					['Hero gear pieces', d.hero_gear_pieces],
-					['Hero gear forge total', d.hero_gear_refine_total],
-					['Hero gear enhance total', d.hero_gear_enhance_total],
-					['Hero gear tier total', d.hero_gear_tier_total],
-					['Hero gear XP total', d.hero_gear_exp_total != null ? fmtN(d.hero_gear_exp_total) : null],
-					['Hero star total', d.hero_star_total],
-					['Exclusive level total', d.exclusive_level_total],
-					['Gov stars total', d.gov_stars_total],
-					['Gov tier total', d.gov_tier_total],
-					['Gov progress', d.gov_progress],
-					['Charm count', d.charm_count],
-					['Charm level sum (est.)', d.charm_level_sum_guess],
-					['Troop score', d.troop_score]
-				]));
-			}
-
-			function chipsBlock(p) {
-				const parts = [];
-				for (let i = 0; i < CATS.length; i++) {
-					const c = CATS[i];
-					if (RK[c.id] && RK[c.id][p.fid] != null) {
-						parts.push('<span class="chip"><i class="fas ' + c.icon + ' text-indigo-500 text-[11px]"></i> ' + esc(c.label) + ' <b>#' + RK[c.id][p.fid] + '</b></span>');
-					}
-				}
-				if (OP[p.fid] != null) parts.push('<span class="chip"><i class="fas fa-trophy text-yellow-500 text-[11px]"></i> Overall <b>#' + OP[p.fid] + '</b></span>');
-				if (p.isTransfer) parts.push(transferBadgeHTML());
-				return '<div class="flex flex-wrap gap-2 mb-6">' + parts.join('') + '</div>';
+				tbl += "</tbody></table></div>";
+				return sec("March stats", tbl)
 			}
 
 			function detailBody(p) {
-				return chipsBlock(p) + coreBlock(p) + leadBlock(p) + troopsBlock(p) + heroesBlock(p) + govBlock(p) + derivedBlock(p) + boardsBlock(p) + powerBlock(p) + specBlock(p) + marchBlock(p) + champBlock(p) + islandBlock(p) + compBlock(p) + linkedBlock(p) + worldBlock(p) + identityBlock(p) + loadoutBlock(p);
+				return coreBlock(p) + leadBlock(p) + troopsBlock(p) + heroesBlock(p) + govBlock(p) + marchBlock(p)
 			}
 
 			function openPlayer(fid) {
 				const p = byFid(fid);
 				if (!p) return;
-				const metaParts = ['Combat ' + fmtM(p.combatPower), 'Hero power ' + fmtM(p.heroPower), 'Furnace ' + (p.furnaceLevel != null ? p.furnaceLevel : '-'),
-					p.kingdom_rank ? ('Kingdom #' + p.kingdom_rank.rank + '/' + p.kingdom_rank.of) : null,
-					p.ageDays != null ? ('data ' + (p.ageDays === 0 ? 'fresh' : p.ageDays + 'd old')) : null
-				].filter(Boolean);
-				const transferBadge = p.isTransfer ? transferBadgeHTML() : '';
-				$('#drawer').innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + transferBadge + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(metaParts.join(' · ')) + '</div></div><button class="w-10 h-10 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center flex-none" id="closeDrawer" aria-label="Close"><i class="fas fa-times text-lg"></i></button></div>' + '<div class="px-6 py-6">' + detailBody(p) + '</div>';
-				$('#overlay').classList.add('active');
+				const metaParts = ["Combat " + fmtM(p.combatPower), "Hero power " + fmtM(p.heroPower), "Furnace " + (p.furnaceLevel != null ? p.furnaceLevel : "-"), p.ageDays != null ? "data " + (p.ageDays === 0 ? "fresh" : p.ageDays + "d old") : null].filter(Boolean);
+				$("#drawer").innerHTML = '<div class="sticky top-0 bg-white border-b border-slate-100 px-6 py-5 flex items-center gap-4 z-10 rounded-t-[18px]">' + avatar(p, true) + '<div class="min-w-0 flex-1"><h2 class="text-2xl font-bold truncate">' + esc(p.nickname) + '</h2><div class="text-[12.5px] text-slate-500 truncate">' + esc(metaParts.join(" · ")) + '</div></div><button class="w-10 h-10 rounded-full hover:bg-slate-100 text-slate-500 flex items-center justify-center flex-none" id="closeDrawer" aria-label="Close"><i class="fas fa-times text-lg"></i></button></div>' + '<div class="px-6 py-6">' + detailBody(p) + "</div>";
+				$("#overlay").classList.add("active")
 			}
 
 			function closeDrawer() {
-				$('#overlay').classList.remove('active');
+				$("#overlay").classList.remove("active")
 			}
-			document.addEventListener('click', function(e) {
-				const closeBtn = e.target.closest('#closeDrawer');
+			document.addEventListener("click", function(e) {
+				const closeBtn = e.target.closest("#closeDrawer");
 				if (closeBtn) return closeDrawer();
-				if (e.target.id === 'overlay') return closeDrawer();
-				const row = e.target.closest('[data-f]');
-				if (row && !e.target.closest('a.player-link')) return openPlayer(row.getAttribute('data-f'));
-				const link = e.target.closest('a.player-link');
+				if (e.target.id === "overlay") return closeDrawer();
+				const row = e.target.closest("[data-f]");
+				if (row && !e.target.closest("a.player-link")) return openPlayer(row.getAttribute("data-f"));
+				const link = e.target.closest("a.player-link");
 				if (link) {
 					e.preventDefault();
-					return openPlayer(link.getAttribute('data-f'));
+					return openPlayer(link.getAttribute("data-f"))
 				}
-				const hcell = e.target.closest('.grid-header[data-k]');
+				const hcell = e.target.closest(".grid-header[data-k]");
 				if (hcell) {
-					const k = hcell.getAttribute('data-k');
+					const k = hcell.getAttribute("data-k");
 					if (state.sortKey === k) state.sortDir *= -1;
 					else {
 						state.sortKey = k;
-						state.sortDir = 1;
+						state.sortDir = 1
 					}
-					renderTable();
+					renderTable()
 				}
 			});
-			document.addEventListener('keydown', function(e) {
-				if (e.key === 'Escape') closeDrawer();
+			document.addEventListener("keydown", function(e) {
+				if (e.key === "Escape") closeDrawer()
 			});
 
 			function wireToggles() {
-				const ex = $('#excludeTransfers');
-				if (ex) ex.addEventListener('click', function() {
+				const ex = $("#excludeTransfers");
+				if (ex) ex.addEventListener("click", function() {
 					state.excludeTransfers = !state.excludeTransfers;
-					ex.classList.toggle('on', state.excludeTransfers);
-					renderTable();
+					ex.classList.toggle("on", state.excludeTransfers);
+					renderTable()
 				});
-				const q = $('#q');
-				if (q) q.addEventListener('input', function() {
+				const q = $("#q");
+				if (q) q.addEventListener("input", function() {
 					state.search = q.value.trim().toLowerCase();
-					renderTable();
+					renderTable()
 				});
-				const cats = $('#overallcats');
-				if (cats) cats.addEventListener('change', function(e) {
-					const cb = e.target.closest('input[data-c]');
+				const cats = $("#overallcats");
+				if (cats) cats.addEventListener("change", function(e) {
+					const cb = e.target.closest("input[data-c]");
 					if (!cb) return;
-					const id = cb.getAttribute('data-c');
+					const id = cb.getAttribute("data-c");
 					if (cb.checked) state.overall.add(id);
 					else state.overall.delete(id);
 					renderCatToggles();
 					compute();
-					renderTable();
+					renderTable()
 				});
-				const csv = $('#csv');
-				if (csv) csv.addEventListener('click', exportCSV);
+				const csv = $("#csv");
+				if (csv) csv.addEventListener("click", exportCSV)
 			}
 
 			function exportCSV() {
-				const cols = ['fid', 'nickname', 'combatPower', 'heroPower', 'overall_rank'];
-				for (let i = 0; i < CATS.length; i++) cols.push(CATS[i].id + '_rank');
-				cols.push('gov_label', 'charm_sum', 'troop_score');
-				const lines = [cols.join(',')];
+				const cols = ["fid", "nickname", "combatPower", "heroPower", "overall_rank"];
+				for (let i = 0; i < CATS.length; i++) cols.push(CATS[i].id + "_rank");
+				cols.push("gov_label", "charm_sum", "troop_score");
+				const lines = [cols.join(",")];
 				const rows = tableRows();
 				for (let i = 0; i < rows.length; i++) {
 					const p = rows[i];
-					const vals = [p.fid, p.nickname, p.combatPower, p.heroPower, OP[p.fid] || ''];
-					for (let j = 0; j < CATS.length; j++) vals.push((RK[CATS[j].id] && RK[CATS[j].id][p.fid]) || '');
-					vals.push(govLabel(p), dd(p).charm_level_sum_guess || '', dd(p).troop_score || '');
-					lines.push(vals.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(','));
+					const vals = [p.fid, p.nickname, p.combatPower, p.heroPower, OP[p.fid] || ""];
+					for (let j = 0; j < CATS.length; j++) vals.push(RK[CATS[j].id] && RK[CATS[j].id][p.fid] || "");
+					vals.push(govLabel(p), dd(p).charm_level_sum_guess || "", dd(p).troop_score || "");
+					lines.push(vals.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(","))
 				}
-				const blob = new Blob([lines.join('\n')], {
-					type: 'text/csv'
+				const blob = new Blob([lines.join("\n")], {
+					type: "text/csv"
 				});
-				const a = document.createElement('a');
+				const a = document.createElement("a");
 				a.href = URL.createObjectURL(blob);
-				a.download = 'alliance.csv';
-				a.click();
+				a.download = "alliance.csv";
+				a.click()
 			}
 			async function loadNames() {
 				try {
-					const r = await fetch('names.json', {
-						cache: 'no-store'
+					const r = await fetch("names.json", {
+						cache: "no-store"
 					});
 					if (!r.ok) return;
 					const j = await r.json();
-					if (j && j.hero) NAMES.hero = j.hero;
-				} catch (e) {
-					/* keep empty map — heroName() will fall back to player.heroes[].name */
-				}
+					if (j && j.hero) NAMES.hero = j.hero
+				} catch (e) {}
 			}
 			async function load() {
-				$('#loader').classList.remove('hidden');
+				$("#loader").classList.remove("hidden");
 				await loadNames();
 				try {
-					const r = await fetch('alliance_full.json', {
-						cache: 'no-store'
+					const r = await fetch("alliance_full.json", {
+						cache: "no-store"
 					});
-					if (!r.ok) throw new Error('HTTP ' + r.status);
-					D = await r.json();
+					if (!r.ok) throw new Error("HTTP " + r.status);
+					D = await r.json()
 				} catch (e) {
-					$('#loader').innerHTML = '<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center"><div class="text-rose-500 text-4xl mb-3"><i class="fas fa-triangle-exclamation"></i></div><p class="text-slate-700 font-semibold">Could not load alliance_full.json</p><p class="text-slate-500 text-sm mt-1">' + esc(e.message) + '</p><p class="text-slate-400 text-xs mt-3">Run capture.py first, then serve this folder over HTTP (e.g. <code>python -m http.server</code>).</p></div>';
-					return;
+					$("#loader").innerHTML = '<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center"><div class="text-rose-500 text-4xl mb-3"><i class="fas fa-triangle-exclamation"></i></div><p class="text-slate-700 font-semibold">Could not load alliance_full.json</p><p class="text-slate-500 text-sm mt-1">' + esc(e.message) + '</p><p class="text-slate-400 text-xs mt-3">Run capture.py first, then serve this folder over HTTP (e.g. <code>python -m http.server</code>).</p></div>';
+					return
 				}
 				P = (D.players || []).map(p => Object.assign({}, p, {
 					isTransfer: isTransferPlayer(p)
 				}));
 				const a = D.alliance || {};
-				$('#title').textContent = a.name || 'Alliance';
-				$('#subtitle').textContent = (a.abbr ? '[' + a.abbr + '] · ' : '') + 'AID ' + (a.aid || '-') + ' · ' + P.length + ' players';
-				$('#memberCount').textContent = P.length + ' members';
-				$('#brandLogo').textContent = (a.abbr || a.name || 'A').trim().charAt(0).toUpperCase();
-				document.title = (a.name || 'Alliance') + ' · Data Viewer';
+				$("#title").textContent = a.name || "Alliance";
+				$("#subtitle").textContent = (a.abbr ? "[" + a.abbr + "] · " : "") + "AID " + (a.aid || "-") + " · " + P.length + " players";
+				$("#memberCount").textContent = P.length + " members";
+				$("#brandLogo").textContent = (a.abbr || a.name || "A").trim().charAt(0).toUpperCase();
+				document.title = (a.name || "Alliance") + " · Data Viewer";
 				compute();
 				renderCatToggles();
 				renderTable();
 				renderStats();
 				wireToggles();
-				$('#loader').classList.add('hidden');
-				$('#page').classList.remove('hidden');
+				$("#loader").classList.add("hidden");
+				$("#page").classList.remove("hidden")
 			}
-			load();
+			load().catch(function(error) {
+				console.error("Alliance viewer error:", error);
+				const loader = $("#loader");
+				loader.classList.remove("hidden");
+				loader.innerHTML = '<div class="max-w-lg mx-auto bg-white rounded-2xl shadow-sm p-10 text-center">' + '<div class="text-rose-500 text-4xl mb-3">' + '<i class="fas fa-triangle-exclamation"></i></div>' + '<p class="text-slate-700 font-semibold">Something went wrong</p>' + '<p class="text-slate-500 text-sm mt-2">' + esc(error.message || String(error)) + "</p></div>"
+			});
 
 		</script>
 	</body>
